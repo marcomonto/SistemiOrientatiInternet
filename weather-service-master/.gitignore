@@ -46,7 +46,7 @@ testem.log
 /keys/public.json
 *.sqlite
 *.sqlite-journal
-.env
+#.env
 
 # System Files
 .DS_Store
