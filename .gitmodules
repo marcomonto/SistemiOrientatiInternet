@@ -1,0 +1,6 @@
+[submodule "backend/todo-server"]
+ 	path = backend/todo-server
+	branch = master
+[submodule "frontend/todo-app"]
+	path = frontend/todo-app
+	branch = master
