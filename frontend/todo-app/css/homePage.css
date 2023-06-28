@@ -1,0 +1,61 @@
+/* Window Card Component CSS */
+
+.window-card {
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.window-card h3 {
+  margin: 0 0 10px;
+}
+
+.window-card span {
+  margin-right: 5px;
+}
+
+.window-card button {
+  margin-right: 5px;
+}
+
+
+/* Door Card Component CSS */
+
+.door-card {
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.door-card h3 {
+  margin: 0 0 10px;
+}
+
+.door-card span {
+  margin-right: 5px;
+}
+
+.door-card button {
+  margin-right: 5px;
+}
+.circle {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background-color: green;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}

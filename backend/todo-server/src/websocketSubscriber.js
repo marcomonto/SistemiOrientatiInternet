@@ -1,6 +1,6 @@
 
 import { WebSocket } from 'ws';
-import memoryService from './memoryService';
+import memoryService from "./memoryService.js";
 
 export function subscribeToServices(services) {
   for (const service of services) {
@@ -31,18 +31,3 @@ export function subscribeToServices(services) {
     });
   }
 }
-
-  /**
-   * Sends any message through the WebSocket channel.
-   * @param msg Any message
-   * @private
-   */
-  function _send(msg) {
-    if (this.#config.failures && Math.random() < this.#config.errorProb) {
-      console.info('🐛 There\'s a bug preventing the message to be sent', {handler: this.#name});
-      return;
-    }
-
-    console.debug('💬 Dispatching message', {handler: this.#name});
-    this.#ws.send(JSON.stringify(msg));
-  }

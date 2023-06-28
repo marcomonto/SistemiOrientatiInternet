@@ -11,7 +11,7 @@
   async function init() {
     const token = localStorage.getItem('id_token');
     let elem, /** @type {{init:()=>Promise<HTMLElement>,destroy:()=>void}} */ comp;
-    if (token) {
+    /*    if (token) {
       // initializes the tasks
       comp = new TasksComponent(client);
       if (subscription) {
@@ -22,12 +22,17 @@
       // initializes the login panel
       comp = new LoginComponent(client);
       subscription = comp.on('authenticated', init);
-    }
-
+    }*/
+    comp = new DoorCardComponent(2,1);
     elem = await comp.init();
-    components.forEach(c => c.destroy());
+    //components.forEach(c => c.destroy());
     await root.appendChild(elem);
     components.push(comp);
+    comp = new WindowCardComponent(2,1);
+    elem = await comp.init();
+    await root.appendChild(elem);
+    components.push(comp);
+    console.log(components)
   }
 
   // initializes the components

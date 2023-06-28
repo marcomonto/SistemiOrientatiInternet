@@ -14,7 +14,6 @@ import compression from 'compression';
 // own modules
 import opts from './options.js';
 import { routes } from './routes.js';
-import { OIDCMiddleware } from './openid.js';
 import { subscribeToServices } from './websocketSubscriber.js'
 import memoryService from './memoryService.js';
 
@@ -67,12 +66,12 @@ function fallbacks(app) {
 async function run() {
     // creates the configuration options and the logger
     const options = opts();
-    const oidc = new OIDCMiddleware(options.config.oidc);
-    await oidc.init();
+   /* const oidc = new OIDCMiddleware(options.config.oidc);
+    await oidc.init();*/
 
     const app = express();
     init(app);
-    routes(app, oidc, options.config);
+    routes(app,  options.config);
     fallbacks(app);
 
     subscribeToServices(memoryService.connections)

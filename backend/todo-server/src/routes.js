@@ -65,16 +65,16 @@ function isInteger(n) {
  * @param {OIDCMiddleware} oidc OpenID Connect middleware
  * @param {{iface: string, port: number, auth: boolean, oidc: {redirect: string, clientId: string, secret: string}}} config Configuration options
  */
-export function routes(app, oidc, config) {
+export function routes(app, config) {
     const authenticate = config.auth ? (req, res, next) => oidc.validate(req, res, next) : (_req, _res, next) => next();
 
     app.get('/login', (req, resp) => {
-        oidc.login(req, resp);
+        //oidc.login(req, resp);
     });
 
     app.get('/tokens', (req, resp) => {
         // noinspection JSIgnoredPromiseFromCall
-        oidc.tokens(req, resp);
+        //oidc.tokens(req, resp);
     });
 
     app.get('/tasks', authenticate, (req, resp) => {
