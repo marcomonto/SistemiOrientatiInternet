@@ -38,19 +38,30 @@
       this.#element = document.createElement('div');
       this.#element.className = 'door-card';
 
-      const title = document.createElement('h3');
-      title.textContent = 'Door Information';
-      this.#element.appendChild(title);
+      const icon = document.createElement('i');
+      icon.className = 'bi-door';
+      this.#element.appendChild(icon);
 
-      const totalLabel = document.createElement('span');
-      totalLabel.textContent = 'Total Doors:';
+      const circle = document.createElement('div');
+      circle.className = 'circle';
+      this.#element.appendChild(circle);
+
+      const cardBody = document.createElement('div');
+      cardBody.className = 'card-body';
+      this.#element.appendChild(cardBody);
+
+      const totalLabel = document.createElement('h5');
+      totalLabel.className = 'card-title';
+      totalLabel.textContent = 'Door'
       this.#element.appendChild(totalLabel);
 
-      const totalValue = document.createElement('span');
+      const totalValue = document.createElement('p');
+      totalValue.className = 'card-text';
       totalValue.textContent = this.#totalDoors.toString();
       this.#element.appendChild(totalValue);
 
-      const openedLabel = document.createElement('span');
+      const openedLabel = document.createElement('a');
+      openedLabel.className = 'btn btn-primary';
       openedLabel.textContent = 'Opened Doors:';
       this.#element.appendChild(openedLabel);
 
