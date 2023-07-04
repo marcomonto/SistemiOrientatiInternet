@@ -23,6 +23,12 @@
       comp = new LoginComponent(client);
       subscription = comp.on('authenticated', init);
     }*/
+    comp = new LoginComponent(client);
+    elem = await comp.init();
+    //components.forEach(c => c.destroy());
+    await root.appendChild(elem);
+    components.push(comp);
+    comp = new WindowCardCom
     comp = new DoorCardComponent(2,1);
     elem = await comp.init();
     //components.forEach(c => c.destroy());

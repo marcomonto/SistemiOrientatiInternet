@@ -1,5 +1,6 @@
 <!doctype html>
 <html class="no-js" lang="en">
+
 <head>
   <meta charset="utf-8">
   <title>SOI - Lab</title>
@@ -22,45 +23,96 @@
   <link rel="stylesheet" href="css/eos-icons.css">
 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
 </head>
-  <meta name="theme-color" content="#fafafa">
+<meta name="theme-color" content="#fafafa">
 </head>
+
 <body>
+  <div style="height: 100vh;">
 
-<div class="content">
+    <div class="content" style="min-height: calc(100% - 100px);">
 
-  <!-- Header -->
-  <div class="header">
-    <h1 class="text-center"><img class="logo" src="icon.png" width="52" alt="UniPR Logo">Things to do</h1>
+      <!-- Header -->
+      <div class="header">
+        <h1 class="text-center d-flex align-items-center">
+          <div style="    
+            font-size: 76px;
+            line-height: 1.25;
+            font-weight: 900;
+            letter-spacing: -1.5px;
+            margin: 0 auto;
+            background: -webkit-linear-gradient(315deg,#42d392 25%,#647eff);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;">
+                  Home Lookout
+          </div>
+        </h1>
+      </div>
+
+      <div id="root"></div>
+    </div>
+    <footer style="
+      position: sticky;
+      bottom: 0;
+      width: 100%;"
+      >
+      <ul class="nav justify-content-center border-bottom  mb-1">
+        <li class="nav-item"><a href="https://marcomontorsi.it" class="nav-link px-2 text-muted">About</a></li>
+      </ul>
+      <p class="text-center text-muted">&copy; Developed with 😢 by Marco Montorsi</p>
+    </footer>
   </div>
-
-  <div id="root"></div>
-</div>
-
-<script type="text/html" id="login-template">
-  <div class="panel">
-    <label>Sign in with Google</label> &nbsp;
-    <button class="outline clickable">
-      <svg xmlns="http://www.w3.org/2000/svg" width="18px" height="18px" viewBox="0 0 48 48" class="abcRioButtonSvg">
-        <g>
-          <path fill="#EA4335"
-                d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path>
-          <path fill="#4285F4"
-                d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path>
-          <path fill="#FBBC05"
-                d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path>
-          <path fill="#34A853"
-                d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path>
-          <path fill="none" d="M0 0h48v48H0z"></path>
-        </g>
-      </svg>
-      <span>Sign In</span>
-    </button>
-  </div>
+  <script type="text/html" id="login-template">
+    <div class="container-fluid h-custom" >
+      <div class="row d-flex justify-content-center align-items-center h-100">
+        <div class="col-md-9 col-lg-6 col-xl-5">
+          <img src="img/binocolo.png"
+            class="img-fluid" alt="Sample image">
+        </div>
+        <div class="col-md-8 col-lg-6 col-xl-4 offset-xl-1">
+          <form>  
+            <!-- Email input -->
+            <div class="form-outline mb-4">
+              <input type="email" id="form3Example3" class="form-control form-control-lg"
+                placeholder="Enter a valid email address" />
+              <label class="form-label" for="form3Example3">Email address</label>
+            </div>
+  
+            <!-- Password input -->
+            <div class="form-outline mb-3">
+              <input type="password" id="form3Example4" class="form-control form-control-lg"
+                placeholder="Enter password" />
+              <label class="form-label" for="form3Example4">Password</label>
+            </div>
+  
+            <div class="d-flex justify-content-between align-items-center">
+              <!-- Checkbox -->
+              <div class="form-check mb-0">
+                <input class="form-check-input me-2" type="checkbox" value="" id="form2Example3" />
+                <label class="form-check-label" for="form2Example3">
+                  Remember me
+                </label>
+              </div>
+              <a href="#!" class="text-body">Forgot password?</a>
+            </div>
+  
+            <div class="text-center text-lg-start mt-4 pt-2">
+              <button type="button" class="btn btn-primary btn-lg"
+                style="padding-left: 2.5rem; padding-right: 2.5rem;">Login</button>
+              <p class="small fw-bold mt-2 pt-1 mb-0">Don't have an account? <a href="#!"
+                  class="link-danger">Register</a></p>
+            </div>
+  
+          </form>
+        </div>
+      </div>
+    </div>
 </script>
 
-<script type="text/html" id="tasks-template">
+  <script type="text/html" id="tasks-template">
   <!-- Panels -->
   <div class="panel">
     <h3>Enter new things to do</h3>
@@ -88,9 +140,9 @@
     <!-- Tasks -->
     <div class="tasks"></div>
   </div>
-</script>
+  </script>
 
-<script type="text/html" id="task-template">
+  <script type="text/html" id="task-template">
   <div class="task-left">
     <input type="checkbox" id="" name="">
     <label for="" class="task-item"></label>
@@ -102,7 +154,7 @@
   </div>
 </script>
 
-<script type="text/html" id="task-edit-template">
+  <script type="text/html" id="task-edit-template">
   <div class="form-group">
     <div class="input-group">
       <input type="text" placeholder="Please enter some description">
@@ -111,27 +163,23 @@
     </div>
   </div>
 </script>
-<div class="card" style="width: 18rem;">
-  <i class="bi-alarm"></i>
-  <div class="circle"></div>
-  <div class="card-body">
-    <h5 class="card-title">Card title</h5>
-    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-    <a href="#" class="btn btn-primary">Go somewhere</a>
-  </div>
-</div>
-<script src="js/vendor/modernizr-3.11.2.min.js"></script>
-<script src="js/plugins.js"></script>
-<script src="js/commons.js"></script>
-<script src="js/rest-client.js"></script>
-<script src="js/models.js"></script>
-<script src="js/login.component.js"></script>
-<script src="js/task.component.js"></script>
-<script src="js/tasks.component.js"></script>
-<script src="js/doorCard-component.js"></script>
-<script src="js/windowCard-component.js"></script>
-<script src="js/main.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
+
+
+  <script src="js/vendor/modernizr-3.11.2.min.js"></script>
+  <script src="js/plugins.js"></script>
+  <script src="js/commons.js"></script>
+  <script src="js/rest-client.js"></script>
+  <script src="js/models.js"></script>
+  <script src="js/login.component.js"></script>
+  <script src="js/task.component.js"></script>
+  <script src="js/tasks.component.js"></script>
+  <script src="js/doorCard-component.js"></script>
+  <script src="js/windowCard-component.js"></script>
+  <script src="js/main.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
+    crossorigin="anonymous"></script>
 
 </body>
+
 </html>
