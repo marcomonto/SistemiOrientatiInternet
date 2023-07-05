@@ -24,6 +24,7 @@ function configFromEnv() {
     const cfg = {};
     if (process.env.IFACE) cfg.iface = process.env.IFACE;
     if (process.env.PORT) cfg.port = process.env.PORT;
+    if (process.env.JWT_SECRET_KEY) cfg.jwtSecretKey = process.env.JWT_SECRET_KEY;
 /*    if (process.env.OIDC_CLIENT_ID) (cfg.oidc = cfg.oidc || {}).clientId = process.env.OIDC_CLIENT_ID;
     if (process.env.OIDC_SECRET) (cfg.oidc = cfg.oidc || {}).secret = process.env.OIDC_SECRET;
     if (process.env.OIDC_REDIRECT) (cfg.oidc = cfg.oidc || {}).redirect = process.env.OIDC_REDIRECT;*/
@@ -38,7 +39,7 @@ function configFromEnv() {
 export function parse() {
     const {version} = JSON.parse(readFileSync('./package.json'));
 
-    // generic properties
+/*    // generic properties
     program
         .version(version)
         .option('-i, --iface <interface>', 'The interface the service will listen to for requests')
@@ -48,19 +49,19 @@ export function parse() {
         .option('-r, --oidc-redirect <uri>', 'OpenID Connect redirect URI')
         .option('-E, --no-env', 'Ignores the .env file')
         .option('-A, --no-auth', 'Disables authentication and authorization')
-    ;
-
-    // parses command line
     program.parse(process.argv);
     assertPort(program.port, program, 2);
+    ;*/
 
-    const env = !program.env ? {} : configFromEnv();
 
-    const config = merge(env, {
+    const config = configFromEnv();
+
+   /* const config = merge(env, {
         iface: program.iface,
         port: program.port,
         auth: program.auth,
-    });
+
+    });*/
     return {config};
 }
 

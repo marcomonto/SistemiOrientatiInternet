@@ -3,7 +3,7 @@
 (function (win) {
 
   function mkUrl(baseUrl, path, queryParams) {
-    const url = new URL(baseUrl, document.baseURI);
+    const url = new URL(baseUrl, 'http://localhost:8000');
     if (path) {
       const sep = url.pathname.endsWith('/') || path.startsWith('/') ? '' : '/';
       url.pathname += sep + path;
@@ -80,9 +80,10 @@
      * @return {Promise} A promise of the JSON response.
      * @private
      */
-    _send(method, path, body, queryParams, headers) {
+    _send(method, path, body, queryParams, headers, withCredentials = false) {
       return new Promise((resolve, reject) => {
         const req = new XMLHttpRequest();
+        req.withCredentials = !!withCredentials;
 
         // prepares the response handler
         req.onreadystatechange = () => handleJsonResponse(req, resolve, reject);
@@ -108,8 +109,8 @@
      * @param headers {Object?} Optional headers
      * @return {Promise} A promise of the JSON response.
      */
-    get(path, queryParams, headers) {
-      return this._send('GET', path, null, queryParams, headers);
+    get(path, queryParams, headers,withCredentials) {
+      return this._send('GET', path, null, queryParams, headers, withCredentials);
     }
 
     /**
