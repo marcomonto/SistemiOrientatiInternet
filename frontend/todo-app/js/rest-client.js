@@ -80,10 +80,10 @@
      * @return {Promise} A promise of the JSON response.
      * @private
      */
-    _send(method, path, body, queryParams, headers, withCredentials = false) {
+    _send(method, path, body, queryParams, headers) {
       return new Promise((resolve, reject) => {
         const req = new XMLHttpRequest();
-        req.withCredentials = !!withCredentials;
+        req.withCredentials = true;
 
         // prepares the response handler
         req.onreadystatechange = () => handleJsonResponse(req, resolve, reject);
@@ -109,8 +109,8 @@
      * @param headers {Object?} Optional headers
      * @return {Promise} A promise of the JSON response.
      */
-    get(path, queryParams, headers,withCredentials) {
-      return this._send('GET', path, null, queryParams, headers, withCredentials);
+    get(path, queryParams, headers) {
+      return this._send('GET', path, null, queryParams, headers);
     }
 
     /**

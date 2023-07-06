@@ -30,14 +30,17 @@ function init(app) {
     app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({ extended: true }));
     app.use(cookieParser());
-    app.use(cors());
+    app.use(cors({
+        origin: 'http://localhost:8080',
+        credentials: true
+    }));
 
 
-    app.use(function(req, res, next) {
+/*    app.use(function(req, res, next) {
         res.header('Access-Control-Allow-Origin', req.headers.origin);
         res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         next();
-    });
+    });*/
     // sets the correlation id of any incoming requests
     app.use((req, res, next) => {
         req.correlationId = req.get('X-Request-ID') || uuid();
