@@ -44,13 +44,11 @@
     }
     async test() {
       try{
-        let response = await this.#client.get('home', null , null, true)
+        let response = await this.#client.get('updateInfo')
         console.log(response)
-
       }
       catch (err) {
         console.log(err)
-
       }
     }
   }

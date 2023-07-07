@@ -63,13 +63,10 @@ export class DoorHandler extends EventEmitter {
       this._send({error: e.message});
       return;
     }
-
-    // @formatter:off
     switch (json.type) {
       case 'subscribe': this._onSubscribe(); break;
       case 'unsubscribe': this._onUnsubscribe(); break;
     }
-    // @formatter:on
   }
 
   stop() {
