@@ -1,33 +1,36 @@
-
-import { WebSocket } from 'ws';
+import {WebSocket} from 'ws';
 import memoryService from "./memoryService.js";
 
 export function subscribeToServices(services) {
   for (const service of services) {
-
     const ws = new WebSocket(service.address);
-
     // Event: WebSocket connection opened
     ws.on('open', () => {
-      console.log('Connected to the websocket server with address' + service.serviceType);
-      if(service.serviceType == memoryService.typeService.WEATHER){
-        
+      console.log('Connected to the websocket server with address ' + service.serviceType);
+      if (service.serviceType === memoryService.serviceTypes.WEATHER) {
+        ws.send(JSON.stringify({type:'subscribe', target: 'temperature'}));
       }
-        
     });
-
     ws.on('message', (data) => {
       const message = JSON.parse(data);
+      if(!memoryService.activeServices.find(el => el.id === service.id))
+        memoryService.activeServices.push(service);
       console.log('Received message:', message);
       // Handle the received message as needed
     });
-
-    ws.on('close', () => {
-      console.log('Disconnected from the websocket server.');
+    ws.on('close', (code) => {
+      console.log('closeeeee')
+      //setTimeout(() => subscribeToServices([{...service}]), 5000);
     });
-
     ws.on('error', (error) => {
-      console.error('WebSocket error:', error);
+      if (error.code === 'ECONNREFUSED') {
+        if(!service.tries || service.tries < 3){
+          console.log('I will retry to connect in 30s...')
+          setTimeout(() => subscribeToServices([{...service, tries: !!service.tries ? (service.tries + 1) : 1}]), 30000);
+        }
+        else
+          console.log('too many tries for' + service.serviceType)
+      }
     });
   }
 }

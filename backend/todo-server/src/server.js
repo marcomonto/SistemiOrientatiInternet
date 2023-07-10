@@ -34,8 +34,6 @@ function init(app) {
         origin: 'http://localhost:8080',
         credentials: true
     }));
-
-
 /*    app.use(function(req, res, next) {
         res.header('Access-Control-Allow-Origin', req.headers.origin);
         res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");

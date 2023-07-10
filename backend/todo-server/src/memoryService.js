@@ -8,13 +8,13 @@ class MemoryService {
     THERMOMETER: 'thermometer',
     WEATHER: 'weather'
   };
-  activeServices= [];
+  activeServices = [];
 
   constructor() {
     this.connections = [
-      { address: 'ws://127.0.0.1:8001', serviceType: this.serviceTypes.WINDOW},
-      { address: 'ws://127.0.0.1:8002', serviceType: this.serviceTypes.WEATHER},
-      { address: 'ws://127.0.0.1:8003', serviceType: this.serviceTypes.DOOR}
+      { address: 'ws://127.0.0.1:8001', serviceType: this.serviceTypes.WINDOW, id: 1},
+      { address: 'ws://127.0.0.1:8002', serviceType: this.serviceTypes.WEATHER, id: 2},
+      { address: 'ws://127.0.0.1:8003', serviceType: this.serviceTypes.DOOR, id: 3}
     ];
   }
 
