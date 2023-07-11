@@ -2,6 +2,7 @@
 
 import {DateTime} from 'luxon';
 import {EventEmitter} from 'events';
+import memoryService from "./memoryService.js";
 
 class ValidationError extends Error {
   #message;
@@ -16,11 +17,7 @@ class ValidationError extends Error {
   }
 }
 
-const statusEnum = {
-  ON: 'on',
-  OFF: 'off',
-  ERROR: 'error'
-};
+
 /**
  * A WebSocket handler to deal with weather subscriptions.
  */
@@ -133,7 +130,7 @@ export class WindowHandler extends EventEmitter {
    */
   _sendTemperature() {
     //const value = temperatureAt(DateTime.now());
-    const msg = {type: 'temperature', dateTime: DateTime.now().toISO(), value};
+    const msg = {type: 'status', dateTime: DateTime.now().toISO(), value};
 
     // message is always appended to the buffer
     this.#buffer.push(msg);

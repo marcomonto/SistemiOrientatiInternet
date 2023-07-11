@@ -9,6 +9,7 @@ class MemoryService {
     WEATHER: 'weather'
   };
   activeServices = [];
+  notActiveServices = [];
 
   constructor() {
     this.connections = [

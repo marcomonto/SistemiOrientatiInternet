@@ -13,13 +13,17 @@ export function subscribeToServices(services) {
     });
     ws.on('message', (data) => {
       const message = JSON.parse(data);
-      if(!memoryService.activeServices.find(el => el.id === service.id))
+      if(!memoryService.activeServices.find(el => el.id === service.id)){
+        memoryService.notActiveServices = memoryService.notActiveServices.filter(el => el.id !== service.id)
         memoryService.activeServices.push(service);
+      }
       console.log('Received message:', message);
       // Handle the received message as needed
     });
     ws.on('close', (code) => {
       console.log('closeeeee')
+      memoryService.activeServices = memoryService.activeServices.filter(el => el.id !== service.id)
+      memoryService.notActiveServices.push(service);
       //setTimeout(() => subscribeToServices([{...service}]), 5000);
     });
     ws.on('error', (error) => {
