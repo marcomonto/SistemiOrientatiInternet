@@ -10,6 +10,7 @@ import express from 'express';
 import methodOverride from 'method-override';
 import bodyParser from 'body-parser';
 import compression from 'compression';
+import {WebSocketServer} from 'ws';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 
@@ -80,16 +81,56 @@ async function run() {
 
     const app = express();
     init(app);
-    routes(app, options.config);
+
+    const { iface, port } = options.config;
+    const server = app.listen(port, iface, () => {
+        // noinspection HttpUrlsUsage
+        console.info(`🏁 Server listening: http://${iface}:${port}`);
+    });
+
+    //`🔧 Initializing WSS...
+    const wss = initWss(server, options.config);
+
+    //`🔧 Initializing routes...`);
+    routes(app, wss, options.config);
     fallbacks(app);
 
     subscribeToServices(memoryService.connections)
 
-    const { iface, port } = options.config;
-    app.listen(port, iface, () => {
-        // noinspection HttpUrlsUsage
-        console.info(`🏁 Server listening: http://${iface}:${port}`);
-    });
+
+}
+
+/**
+ * Initializes the WebSocket server.
+ * @param {Server} server HTTP server
+ * @param {{iface: string, port: number}} config Configuration options
+ * @return {WebSocketServer} A WebSocket server
+ */
+function initWss(server, config) {
+    // configuration taken from: https://www.npmjs.com/package/ws#websocket-compression
+    const perMessageDeflate = {
+        zlibDeflateOptions: {
+            chunkSize: 1024,
+            memLevel: 7,
+            level: 3
+        },
+        zlibInflateOptions: {
+            chunkSize: 10 * 1024
+        },
+        clientNoContextTakeover: true, // Defaults to negotiated value
+        serverNoContextTakeover: true, // Defaults to negotiated value
+        serverMaxWindowBits: 10, // Defaults to negotiated value
+        concurrencyLimit: 10, // Limits zlib concurrency for perf
+        threshold: 1024 // Size (in bytes) below which messages should not be compressed if context takeover is disabled
+    };
+
+    const verifyClient = function(info) {
+        //console.log(info.req)
+        return true;
+    };
+
+    const opts = {server, perMessageDeflate, verifyClient};
+    return new WebSocketServer(opts);
 }
 
 // noinspection JSIgnoredPromiseFromCall

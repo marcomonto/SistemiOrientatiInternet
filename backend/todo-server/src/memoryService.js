@@ -26,5 +26,9 @@ class MemoryService {
     this.connections.push({address: address, serviceType: serviceType})
   }
 
+  gatherInfos(){
+
+  }
+
 } export default new MemoryService()
 
