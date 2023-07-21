@@ -1,6 +1,5 @@
 'use strict';
 
-import {DateTime} from 'luxon';
 import {EventEmitter} from 'events';
 import memoryService from "./memoryService.js";
 
@@ -81,9 +80,8 @@ export class WindowHandler extends EventEmitter {
   start() {
     console.debug('New connection received', {handler: this.#name});
 
-    // simulate a client disconnection
     if (this.#config.failures && this.#config.timeToLive > 0) {
-      this._scheduleDeath();
+      //this._scheduleDeath();
     }
   }
 
@@ -120,23 +118,20 @@ export class WindowHandler extends EventEmitter {
    * @return {number} Milliseconds
    * @private
    */
+/*
   _someMillis() {
     return anIntegerWithPrecision(this.#config.frequency, 0.2);
   }
+*/
 
   /**
    * Sends the temperature message.
    * @private
    */
-  _sendTemperature() {
-    //const value = temperatureAt(DateTime.now());
-    const msg = {type: 'status', dateTime: DateTime.now().toISO(), value};
-
-    // message is always appended to the buffer
+  _sendData() {
+    const msg = {type: 'window', dateTime: (new Date()).toISOString(), payload: {status: memoryService.getStatus()}};
     this.#buffer.push(msg);
 
-    // messages are dispatched immediately if delays are disabled or a random number is
-    // generated greater than `delayProb` messages
     if (!this.#config.delays || Math.random() > this.#config.delayProb) {
       for (const bMsg of this.#buffer) {
         this._send(bMsg);
@@ -169,8 +164,8 @@ export class WindowHandler extends EventEmitter {
 
     console.debug('🌡  Subscribing to temperature', {handler: this.#name});
     const callback = () => {
-      this._sendTemperature();
-      this.#timeout = setTimeout(callback, this._someMillis());
+      this._sendData();
+      this.#timeout = setTimeout(callback, 5000);
     };
     this.#timeout = setTimeout(callback, 0);
   }

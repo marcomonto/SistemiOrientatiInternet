@@ -1,6 +1,7 @@
 'use strict';
 import jwt from 'jsonwebtoken';
-import {WebsocketHandler} from "./WebsocketHandler.js";
+import {WebsocketHandler} from "./websocketHandler.js";
+import memoryService from "./memoryService.js";
 
 /**
  * Initializes routes.
@@ -114,6 +115,7 @@ function registerHandler(ws, handler) {
     errorCb(err);
   });
 
+  memoryService.setWebsocketHandlerToClient(handler);
   // starts the handler
   handler.start();
 }

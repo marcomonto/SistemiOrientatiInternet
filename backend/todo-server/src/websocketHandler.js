@@ -104,21 +104,12 @@ export class WebsocketHandler extends EventEmitter {
   }
 
   /**
-   * Generates a random delay in milliseconds.
-   * @return {number} Milliseconds
-   * @private
-   */
-  _someMillis() {
-    return anIntegerWithPrecision(this.#config.frequency, 0.2);
-  }
-
-  /**
    * Sends the temperature message.
    * @private
    */
   _getInfoSensors() {
     const value = memoryService.gatherInfos();
-    const msg = {type: 'temperature', dateTime: DateTime.now().toISO(), payload: value};
+    const msg = {type: 'temperature', dateTime: (new Date()).toISOString(), payload: value};
 
     // message is always appended to the buffer
     this.#buffer.push(msg);
@@ -158,7 +149,7 @@ export class WebsocketHandler extends EventEmitter {
     console.debug('🌡  Subscribing to temperature', {handler: this.#name});
     const callback = () => {
       this._getInfoSensors();
-      this.#timeout = setTimeout(callback, this._someMillis());
+      this.#timeout = setTimeout(callback, 5000);
     };
     this.#timeout = setTimeout(callback, 0);
   }

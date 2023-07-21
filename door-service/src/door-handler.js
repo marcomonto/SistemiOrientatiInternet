@@ -16,11 +16,6 @@ class ValidationError extends Error {
   }
 }
 
-const statusEnum = {
-  ON: 'on',
-  OFF: 'off',
-  ERROR: 'error'
-};
 /**
  * A WebSocket handler to deal with weather subscriptions.
  */
@@ -83,7 +78,7 @@ export class DoorHandler extends EventEmitter {
 
     // simulate a client disconnection
     if (this.#config.failures && this.#config.timeToLive > 0) {
-      this._scheduleDeath();
+      //this._scheduleDeath();
     }
   }
 
@@ -120,17 +115,16 @@ export class DoorHandler extends EventEmitter {
    * @return {number} Milliseconds
    * @private
    */
-  _someMillis() {
+/*  _someMillis() {
     return anIntegerWithPrecision(this.#config.frequency, 0.2);
-  }
+  }*/
 
   /**
    * Sends the temperature message.
    * @private
    */
-  _sendTemperature() {
-    //const value = temperatureAt(DateTime.now());
-    const msg = {type: 'temperature', dateTime: DateTime.now().toISO(), value};
+  _sendData() {
+    const msg = {type: 'window', dateTime: (new Date()).toISOString(), payload: {status: memoryService.getStatus()}};
 
     // message is always appended to the buffer
     this.#buffer.push(msg);
@@ -169,8 +163,8 @@ export class DoorHandler extends EventEmitter {
 
     console.debug('🌡  Subscribing to temperature', {handler: this.#name});
     const callback = () => {
-      this._sendTemperature();
-      this.#timeout = setTimeout(callback, this._someMillis());
+      this._sendData();
+      this.#timeout = setTimeout(callback, 5000);
     };
     this.#timeout = setTimeout(callback, 0);
   }

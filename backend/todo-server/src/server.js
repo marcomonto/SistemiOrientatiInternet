@@ -96,8 +96,6 @@ async function run() {
     fallbacks(app);
 
     subscribeToServices(memoryService.connections)
-
-
 }
 
 /**

@@ -21,7 +21,7 @@ export function subscribeToServices(services) {
       // Handle the received message as needed
     });
     ws.on('close', (code) => {
-      console.log('closeeeee')
+      console.log('connection closed for ' + service.id)
       memoryService.activeServices = memoryService.activeServices.filter(el => el.id !== service.id)
       memoryService.notActiveServices.push(service);
       //setTimeout(() => subscribeToServices([{...service}]), 5000);
