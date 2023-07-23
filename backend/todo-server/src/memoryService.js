@@ -57,5 +57,9 @@ class MemoryService {
     this.websocketClientHandler = handler;
   }
 
+  sendMessageToClient(msg){
+    this.websocketClientHandler.
+  }
+
 } export default new MemoryService()
 

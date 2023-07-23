@@ -17,8 +17,28 @@ export function subscribeToServices(services) {
         memoryService.notActiveServices = memoryService.notActiveServices.filter(el => el.id !== service.id)
         memoryService.activeServices.push(service);
       }
+      if(!!message.payload && !!memoryService.websocketClientHandler){
+        const websocketClient = memoryService.websocketClientHandler;
+        if(service.serviceType === memoryService.serviceTypes.WEATHER){
+          websocketClient.sendData({
+            serviceType: memoryService.serviceTypes.WEATHER,
+            ...message.payload
+          })
+        }
+        else if (service.serviceType === memoryService.serviceTypes.DOOR){
+          websocketClient.sendData({
+            serviceType: memoryService.serviceTypes.WEATHER,
+            ...message.payload
+          })
+        }
+        else if (service.serviceType === memoryService.serviceTypes.WINDOW){
+          websocketClient.sendData({
+            serviceType: memoryService.serviceTypes.WEATHER,
+            ...message.payload
+          })
+        }
+      }
       console.log('Received message:', message);
-      // Handle the received message as needed
     });
     ws.on('close', (code) => {
       console.log('connection closed for ' + service.id)

@@ -126,6 +126,10 @@ export class WebsocketHandler extends EventEmitter {
     }
   }
 
+  sendData(payload){
+
+  }
+
   /**
    * Sends any message through the WebSocket channel.
    * @param msg Any message
