@@ -129,7 +129,12 @@ export class WindowHandler extends EventEmitter {
    * @private
    */
   _sendData() {
-    const msg = {type: 'window', dateTime: (new Date()).toISOString(), payload: {status: memoryService.getStatus()}};
+    const msg = {
+      type: 'door', payload: {
+        dateTime: (new Date()).toISOString(),
+        status: memoryService.getStatus()
+      }
+    };
     this.#buffer.push(msg);
 
     if (!this.#config.delays || Math.random() > this.#config.delayProb) {

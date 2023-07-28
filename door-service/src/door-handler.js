@@ -2,6 +2,7 @@
 
 import {DateTime} from 'luxon';
 import {EventEmitter} from 'events';
+import memoryService from "./memoryService.js";
 
 class ValidationError extends Error {
   #message;
@@ -124,8 +125,12 @@ export class DoorHandler extends EventEmitter {
    * @private
    */
   _sendData() {
-    const msg = {type: 'window', dateTime: (new Date()).toISOString(), payload: {status: memoryService.getStatus()}};
-
+    const msg = {
+      type: 'door', payload: {
+        dateTime: (new Date()).toISOString(),
+        status: memoryService.getStatus()
+      }
+    };
     // message is always appended to the buffer
     this.#buffer.push(msg);
 
@@ -161,7 +166,6 @@ export class DoorHandler extends EventEmitter {
       return;
     }
 
-    console.debug('🌡  Subscribing to temperature', {handler: this.#name});
     const callback = () => {
       this._sendData();
       this.#timeout = setTimeout(callback, 5000);

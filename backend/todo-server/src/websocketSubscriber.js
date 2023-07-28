@@ -10,6 +10,12 @@ export function subscribeToServices(services) {
       if (service.serviceType === memoryService.serviceTypes.WEATHER) {
         ws.send(JSON.stringify({type:'subscribe', target: 'temperature'}));
       }
+      else if (service.serviceType === memoryService.serviceTypes.DOOR) {
+        ws.send(JSON.stringify({type:'subscribe'}));
+      }
+      else if (service.serviceType === memoryService.serviceTypes.WINDOW) {
+        ws.send(JSON.stringify({type:'subscribe'}));
+      }
     });
     ws.on('message', (data) => {
       const message = JSON.parse(data);
@@ -17,28 +23,24 @@ export function subscribeToServices(services) {
         memoryService.notActiveServices = memoryService.notActiveServices.filter(el => el.id !== service.id)
         memoryService.activeServices.push(service);
       }
-      if(!!message.payload && !!memoryService.websocketClientHandler){
-        const websocketClient = memoryService.websocketClientHandler;
+      if(!!message.payload){
+        const payload = message.payload;
         if(service.serviceType === memoryService.serviceTypes.WEATHER){
-          websocketClient.sendData({
-            serviceType: memoryService.serviceTypes.WEATHER,
-            ...message.payload
-          })
+          let activeServiceStored = memoryService.activeServices.find(el => el.id === service.id);
+          activeServiceStored.lastScanAt = payload.dateTime;
+          activeServiceStored.value = payload.value;
         }
         else if (service.serviceType === memoryService.serviceTypes.DOOR){
-          websocketClient.sendData({
-            serviceType: memoryService.serviceTypes.WEATHER,
-            ...message.payload
-          })
+          let activeServiceStored = memoryService.activeServices.find(el => el.id === service.id);
+          activeServiceStored.lastScanAt = payload.dateTime;
+          activeServiceStored.status = payload.status;
         }
         else if (service.serviceType === memoryService.serviceTypes.WINDOW){
-          websocketClient.sendData({
-            serviceType: memoryService.serviceTypes.WEATHER,
-            ...message.payload
-          })
+          let activeServiceStored = memoryService.activeServices.find(el => el.id === service.id);
+          activeServiceStored.lastScanAt = payload.dateTime;
+          activeServiceStored.status = payload.status;
         }
       }
-      console.log('Received message:', message);
     });
     ws.on('close', (code) => {
       console.log('connection closed for ' + service.id)

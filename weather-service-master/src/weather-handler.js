@@ -62,8 +62,12 @@ export class WeatherHandler extends EventEmitter {
 
     // @formatter:off
     switch (json.type) {
-      case 'subscribe': this._onSubscribe(); break;
-      case 'unsubscribe': this._onUnsubscribe(); break;
+      case 'subscribe':
+        this._onSubscribe();
+        break;
+      case 'unsubscribe':
+        this._onUnsubscribe();
+        break;
     }
     // @formatter:on
   }
@@ -133,11 +137,14 @@ export class WeatherHandler extends EventEmitter {
    */
   _sendTemperature() {
     const value = temperatureAt(DateTime.now());
-    const msg = {type: 'temperature', dateTime: DateTime.now().toISO(), value};
-
+    const msg = {
+      type: 'temperature', payload: {
+        dateTime: (new Date()).toISOString(),
+        value: value
+      }
+    };
     // message is always appended to the buffer
     this.#buffer.push(msg);
-
     // messages are dispatched immediately if delays are disabled or a random number is
     // generated greater than `delayProb` messages
     if (!this.#config.delays || Math.random() > this.#config.delayProb) {

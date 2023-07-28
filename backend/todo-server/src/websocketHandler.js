@@ -108,12 +108,9 @@ export class WebsocketHandler extends EventEmitter {
    * @private
    */
   _getInfoSensors() {
-    const value = memoryService.gatherInfos();
-    const msg = {type: 'temperature', dateTime: (new Date()).toISOString(), payload: value};
-
+    const msg = {type: 'update', payload: memoryService.getActiveServicesForUser()};
     // message is always appended to the buffer
     this.#buffer.push(msg);
-
     // messages are dispatched immediately if delays are disabled or a random number is
     // generated greater than `delayProb` messages
     if (!this.#config.delays || Math.random() > this.#config.delayProb) {
@@ -124,10 +121,6 @@ export class WebsocketHandler extends EventEmitter {
     } else {
       console.info(`💤 Due to network delays, ${this.#buffer.length} messages are still queued`, {handler: this.#name});
     }
-  }
-
-  sendData(payload){
-
   }
 
   /**
