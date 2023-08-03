@@ -43,8 +43,6 @@ export class WebsocketHandler extends EventEmitter {
       this._send({error: e.message});
       return;
     }
-
-    // @formatter:off
     switch (json.type) {
       case 'subscribe':
         this._onSubscribe();
@@ -53,7 +51,6 @@ export class WebsocketHandler extends EventEmitter {
         this._onUnsubscribe();
         break;
     }
-    // @formatter:on
   }
 
   stop() {

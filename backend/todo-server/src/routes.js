@@ -115,7 +115,7 @@ function registerHandler(ws, handler) {
     errorCb(err);
   });
 
-  memoryService.setWebsocketHandlerToClient(handler);
+  memoryService.setWebsocketHandlerToClient(handler);// piu client allo stesso websocket che poi dovrà con rxjs tornare i cambiamenti => implementazione frontend => implementazione heat Pump => logica temperatura => grafici? gestione caduta servizi?
   // starts the handler
   handler.start();
 }

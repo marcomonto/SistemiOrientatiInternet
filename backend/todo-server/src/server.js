@@ -17,8 +17,9 @@ import cors from 'cors';
 // own modules
 import opts from './options.js';
 import { routes } from './routes.js';
-import { subscribeToServices } from './websocketSubscriber.js'
+import { subscribeToServices } from './websocketSubscriberToServices.js'
 import memoryService from './memoryService.js';
+import DatabaseHandler from './pocketbase.js';
 
 /**
  * Initializes the application middlewares.
@@ -95,6 +96,12 @@ async function run() {
     routes(app, wss, options.config);
     fallbacks(app);
 
+    //Connecting to database....
+    const database = new DatabaseHandler('http://localhost:8085','prova@mail.com', 'provaprova');
+    await database.connect();
+    memoryService.setDatabaseConnection(database);
+
+    //Subscribing to microservices...
     subscribeToServices(memoryService.connections)
 }
 

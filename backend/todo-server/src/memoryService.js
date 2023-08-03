@@ -9,9 +9,13 @@ class MemoryService {
     THERMOMETER: 'thermometer',
     WEATHER: 'weather'
   };
+  messageType = {
+    SERVICE: 'service',
+  };
   activeServices = [];
   notActiveServices = [];
   websocketClientHandler;
+  #databaseConnection = null;
 
   constructor() {
     this.connections = [
@@ -32,6 +36,18 @@ class MemoryService {
   sendMessageToClient(msg){
     this.websocketClientHandler._send(JSON.stringify(msg))
   }
+  updateWebsocketClients(idServiceUpdated){
+    let service = this.activeServices.find(el => el.id === service.id);
+    this.websocketClientHandler._send(JSON.stringify({
+      type: this.messageType.SERVICE,
+      payload: {
+        serviceType: service.serviceType,
+        value: service.value, // it will be undefined if not weatherService
+        lastScanAt: service.lastScanAt,
+        status: service.status, // it will be undefined if it is weatherService
+      }
+    }))
+  }
   getActiveServicesForUser(){
     let servicesFiltered = [];
     for (const service of this.activeServices){
@@ -42,6 +58,13 @@ class MemoryService {
       }
     }
     return servicesFiltered;
+  }
+  getDatabaseConnection() {
+    return this.#databaseConnection;
+  }
+
+  setDatabaseConnection(value) {
+    this.#databaseConnection = value;
   }
 
 } export default new MemoryService()
