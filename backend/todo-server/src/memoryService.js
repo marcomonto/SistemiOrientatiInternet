@@ -37,7 +37,7 @@ class MemoryService {
     this.websocketClientHandler._send(JSON.stringify(msg))
   }
   updateWebsocketClients(idServiceUpdated){
-    let service = this.activeServices.find(el => el.id === service.id);
+    let service = this.activeServices.find(el => el.id === idServiceUpdated);
     this.websocketClientHandler._send(JSON.stringify({
       type: this.messageType.SERVICE,
       payload: {

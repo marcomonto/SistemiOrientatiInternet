@@ -73,12 +73,44 @@
       };
       socket.onmessage = function (event) {
         console.log('Received message:', event.data);
-        console.log(event);
       };
       socket.onclose = function () {
         console.log('WebSocket connection closed.');
       };
 
+    }
+
+    renderDynamicComponent(componentData) {
+      const { componentType, componentParams } = componentData;
+
+      switch (componentType) {
+        case 'WindowCard':
+          const otherComponent = new WindowCard(componentParams);
+          otherComponent.init().then((element) => {
+            this.#element.appendChild(element);
+          });
+          break;
+        case 'DoorCard':
+          const anotherComponent = new DoorCard(componentParams);
+          anotherComponent.init().then((element) => {
+            this.#element.appendChild(element);
+          });
+          break;
+        case 'HeatPump':
+          const heatPumpCard = new HeatPumpCard(componentParams);
+          heatPumpCard.init().then((element) => {
+            this.#element.appendChild(element);
+          });
+          break;
+        case 'WeatherCard':
+          const weatherCard = new WeatherCard(componentParams);
+          weatherCard.init().then((element) => {
+            this.#element.appendChild(element);
+          });
+          break;
+        default:
+          console.error('Unknown component type:', componentType);
+      }
     }
   }
 

@@ -55,6 +55,16 @@ export function routes(app,wss,  config) {
     }
   });
 
+  app.get('/api/user/details', authenticated, (req, res) => {
+    try {
+      return res.json({
+        success: true
+      })
+    } catch (e) {
+      console.log(e)
+    }
+  });
+
   wss.on('connection', (ws, req) => {
     try {
       const handler = new WebsocketHandler(ws, config, 'client');
