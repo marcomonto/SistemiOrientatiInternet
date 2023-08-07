@@ -2,25 +2,20 @@
  * A card component to display window information.
  */
 (function (win) {
-  class WindowCardComponent extends EventEmitter{
+  class WindowCard extends EventEmitter{
     /** @type {HTMLElement} */
     #element;
-    /** @type {number} */
-    #totalWindows;
-    /** @type {number} */
-    #openedWindows;
+    /** @type {boolean} */
+    #isOpened;
     /** @type {Handler[]} */
     #handlers = [];
 
     /**
      * Creates a new instance of `WindowCardComponent`.
-     * @param totalWindows {number} The total number of windows.
-     * @param openedWindows {number} The count of opened windows.
      */
-    constructor(totalWindows, openedWindows) {
+    constructor( isOpen= true) {
       super();
-      this.#totalWindows = totalWindows;
-      this.#openedWindows = openedWindows;
+      this.#isOpened = isOpen;
     }
 
     /**
@@ -39,16 +34,12 @@
       totalLabel.textContent = 'Total Windows:';
       this.#element.appendChild(totalLabel);
 
-      const totalValue = document.createElement('span');
-      totalValue.textContent = this.#totalWindows.toString();
-      this.#element.appendChild(totalValue);
-
       const openedLabel = document.createElement('span');
       openedLabel.textContent = 'Opened Windows:';
       this.#element.appendChild(openedLabel);
 
       const openedValue = document.createElement('span');
-      openedValue.textContent = this.#openedWindows.toString();
+      openedValue.textContent = this.#isOpened ? 'Open' : 'Closed';
       this.#element.appendChild(openedValue);
 
       const openButton = document.createElement('button');
@@ -70,18 +61,12 @@
      * Opens a window and updates the displayed count.
      */
     openWindow() {
-      this.#openedWindows++;
-      this.updateWindowCount();
     }
 
     /**
      * Closes a window and updates the displayed count.
      */
     closeWindow() {
-      if (this.#openedWindows > 0) {
-        this.#openedWindows--;
-        this.updateWindowCount();
-      }
     }
 
     /**
@@ -89,19 +74,10 @@
      */
     updateWindowCount() {
       const openedValue = this.#element.querySelector('.opened-value');
-      openedValue.textContent = this.#openedWindows.toString();
     }
   }
 
   /* Exporting component */
-  win.WindowCardComponent ||= WindowCardComponent;
+  win.WindowCard ||= WindowCard;
 
 })(window);
-/*// Example usage
-const totalWindows = 5;
-const openedWindows = 2;
-
-const windowCard = new WindowCardComponent(totalWindows, openedWindows);
-const windowCardElement = windowCard.init();
-
-document.getElementById('window-card-container').appendChild(windowCardElement);*/

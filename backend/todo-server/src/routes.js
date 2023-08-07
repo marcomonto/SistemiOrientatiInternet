@@ -68,6 +68,7 @@ export function routes(app,wss,  config) {
   wss.on('connection', (ws, req) => {
     try {
       const handler = new WebsocketHandler(ws, config, 'client');
+      memoryService.setWebsocketHandlerToClient(handler);
       registerHandler(ws, handler);
     } catch (e) {
       console.error('💥 Failed to register WS handler, closing connection', e);
@@ -124,8 +125,9 @@ function registerHandler(ws, handler) {
   handler.on('error', (err) => {
     errorCb(err);
   });
-
-  memoryService.setWebsocketHandlerToClient(handler);// piu client allo stesso websocket che poi dovrà con rxjs tornare i cambiamenti => implementazione frontend => implementazione heat Pump => logica temperatura => grafici? gestione caduta servizi?
+  // piu client allo stesso websocket che poi dovrà con rxjs tornare i cambiamenti =>
+  // implementazione frontend => implementazione heat Pump => logica temperatura =>
+  // grafici? gestione caduta servizi?
   // starts the handler
   handler.start();
 }

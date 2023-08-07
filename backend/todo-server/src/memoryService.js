@@ -1,4 +1,5 @@
 import {Observable} from 'rxjs';
+
 class MemoryService {
 
   connections = [];
@@ -24,41 +25,55 @@ class MemoryService {
       {address: 'ws://127.0.0.1:8003', serviceType: this.serviceTypes.DOOR, id: 3}
     ];
   }
-  addService(params){
+
+  addService(params) {
     const {address, serviceType} = params;
-    if(!this.serviceTypes[serviceType])
+    if (!this.serviceTypes[serviceType])
       return 'nope';
     this.connections.push({address: address, serviceType: serviceType})
   }
-  setWebsocketHandlerToClient(handler){
+
+  setWebsocketHandlerToClient(handler) {
     this.websocketClientHandler = handler;
   }
-  sendMessageToClient(msg){
-    this.websocketClientHandler._send(JSON.stringify(msg))
+
+  sendMessageToClient(msg) {
+    console.log(this.websocketClientHandler)
+    /*   if(!!this.websocketClientHandler)
+         this.websocketClientHandler._send(JSON.stringify(msg))
+       else
+         console.log('non ho clientHandler')*/
   }
-  updateWebsocketClients(idServiceUpdated){
+
+  updateWebsocketClients(idServiceUpdated) {
     let service = this.activeServices.find(el => el.id === idServiceUpdated);
-    this.websocketClientHandler._send(JSON.stringify({
-      type: this.messageType.SERVICE,
-      payload: {
-        serviceType: service.serviceType,
-        value: service.value, // it will be undefined if not weatherService
-        lastScanAt: service.lastScanAt,
-        status: service.status, // it will be undefined if it is weatherService
-      }
-    }))
+    if (!!this.websocketClientHandler) {
+      this.websocketClientHandler.send(
+        {
+          type: this.messageType.SERVICE,
+          payload: {
+            serviceType: service.serviceType,
+            value: service.value, // it will be undefined if not weatherService
+            lastScanAt: service.lastScanAt,
+            status: service.status, // it will be undefined if it is weatherService
+          }
+        }
+      );
+    }
   }
-  getActiveServicesForUser(){
+
+  getActiveServicesForUser() {
     let servicesFiltered = [];
-    for (const service of this.activeServices){
+    for (const service of this.activeServices) {
       let serviceToShow = {};
       for (const [key, value] of Object.entries(service)) {
-        if(!['address','id'].includes(key))
+        if (!['address', 'id'].includes(key))
           serviceToShow[key] = value;
       }
     }
     return servicesFiltered;
   }
+
   getDatabaseConnection() {
     return this.#databaseConnection;
   }
@@ -67,5 +82,7 @@ class MemoryService {
     this.#databaseConnection = value;
   }
 
-} export default new MemoryService()
+}
+
+export default new MemoryService()
 

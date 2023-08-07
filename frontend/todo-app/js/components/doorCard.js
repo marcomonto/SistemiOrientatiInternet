@@ -3,25 +3,20 @@
  */
 (function (win) {
 
-  class DoorCardComponent extends EventEmitter {
+  class DoorCard extends EventEmitter {
     /** @type {HTMLElement} */
     #element;
-    /** @type {number} */
-    #totalDoors;
-    /** @type {number} */
-    #openedDoors;
+    /** @type {boolean} */
+    #isOpen;
     /** @type {Handler[]} */
     #handlers = [];
 
     /**
      * Creates a new instance of `DoorCardComponent`.
-     * @param totalDoors {number} The total number of doors.
-     * @param openedDoors {number} The count of opened doors.
      */
-    constructor(totalDoors, openedDoors) {
+    constructor(isOpen = true) {
       super();
-      this.#totalDoors = totalDoors;
-      this.#openedDoors = openedDoors;
+      this.#isOpen = isOpen;
     }
     /**
      * Destroys this component, removing it from it's parent node.
@@ -55,18 +50,13 @@
       totalLabel.textContent = 'Door'
       this.#element.appendChild(totalLabel);
 
-      const totalValue = document.createElement('p');
-      totalValue.className = 'card-text';
-      totalValue.textContent = this.#totalDoors.toString();
-      this.#element.appendChild(totalValue);
-
       const openedLabel = document.createElement('a');
       openedLabel.className = 'btn btn-primary';
       openedLabel.textContent = 'Opened Doors:';
       this.#element.appendChild(openedLabel);
 
       const openedValue = document.createElement('span');
-      openedValue.textContent = this.#openedDoors.toString();
+      openedValue.textContent = this.#isOpen ? 'Opened' : 'Closed';
       openedValue.className = 'opened-doors-value';
       this.#element.appendChild(openedValue);
 
@@ -89,7 +79,7 @@
      * Opens a door and updates the displayed count.
      */
     openDoor() {
-      this.#openedDoors++;
+      this.#isOpen = !this.#isOpen;
       this.updateDoorCount();
     }
 
@@ -97,10 +87,8 @@
      * Closes a door and updates the displayed count.
      */
     closeDoor() {
-      if (this.#openedDoors > 0) {
-        this.#openedDoors--;
-        this.updateDoorCount();
-      }
+      this.#isOpen = !this.#isOpen;
+      this.updateDoorCount();
     }
 
     /**
@@ -108,12 +96,11 @@
      */
     updateDoorCount() {
       const openedValue = this.#element.querySelector('.opened-doors-value');
-      openedValue.textContent = this.#openedDoors.toString();
     }
   }
 
   /* Exporting component */
-  win.DoorCardComponent ||= DoorCardComponent;
+  win.DoorCard ||= DoorCard;
 
 })(window);
 /*// Example usage

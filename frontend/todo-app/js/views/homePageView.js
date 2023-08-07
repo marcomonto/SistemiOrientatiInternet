@@ -3,11 +3,13 @@
   class ActiveService {
     #id;
     #params;
-    constructor(id , params) {
+
+    constructor(id, params) {
       this.#id = id;
       this.#params = params;
     }
   }
+
   /**
    * A login component.
    */
@@ -18,8 +20,7 @@
     #client;
     /** @type {Handler[]} */
     #handlers = [];
-    /** @type {ActiveService[]} */
-    #activeServices = [];
+    #components = new Map();
 
     /**
      * Instances a new `LoginComponent`.
@@ -48,7 +49,6 @@
       const btn = this.#element.querySelector('button');
       const hdlr = new Handler('click', btn, () => this.test());
       this.#handlers.push(hdlr);
-      //rxjs.fromEvent(document, 'click').subscribe(() => console.log('asdasd!'));
       this.connectWebSocket();
       return this.#element;
     }
@@ -65,14 +65,43 @@
     connectWebSocket() {
       const socket = new WebSocket('ws://localhost:8000'); // Replace with your WebSocket server URL
       // WebSocket event handlers
-      socket.onopen = function () {
+      socket.onopen = () => {
         // Send a message to the WebSocket server
         socket.send(JSON.stringify({
           type: 'subscribe'
         }));
+        this.renderDynamicComponent('DoorCard');
+        this.renderDynamicComponent('WindowCard');
       };
-      socket.onmessage = function (event) {
+      socket.onmessage =  (event) => {
         console.log('Received message:', event.data);
+        try {
+          let message = JSON.parse(event.data);
+          let serviceType = message.payload.serviceType;
+          let data = message.payload;
+          switch (serviceType) {
+            case 'weather':
+              this.renderDynamicComponent('WeatherCard', data);
+              break;
+            case 'window':
+              this.renderDynamicComponent('WindowCard',data);
+              break;
+            case'door':
+              this.renderDynamicComponent('DoorCard', data);
+              break;
+            case 'heatPump':
+              this.renderDynamicComponent('HeatPumpCard', data);
+              break;
+            case 'thermometer':
+              this.renderDynamicComponent('ThermometerCard', data);
+              break;
+            default:
+              break;
+          }
+        } catch (e) {
+          console.log(e)
+        }
+
       };
       socket.onclose = function () {
         console.log('WebSocket connection closed.');
@@ -80,31 +109,54 @@
 
     }
 
-    renderDynamicComponent(componentData) {
-      const { componentType, componentParams } = componentData;
-
+    async renderDynamicComponent(componentType, params) {
       switch (componentType) {
         case 'WindowCard':
-          const otherComponent = new WindowCard(componentParams);
-          otherComponent.init().then((element) => {
-            this.#element.appendChild(element);
-          });
+          if(!this.#components.get('windowCard')){
+            const weatherCard = new WindowCard(params);
+            let element = await weatherCard.init()
+            this.#element.querySelector('#componentsCards').appendChild(element);
+            this.#components.set('windowCard',weatherCard);
+          }
+          else{
+            let component = this.#components.get('windowCard');
+            component.updateStatus(params.value);
+          }
           break;
         case 'DoorCard':
-          const anotherComponent = new DoorCard(componentParams);
-          anotherComponent.init().then((element) => {
-            this.#element.appendChild(element);
-          });
+          if(!this.#components.get('doorCard')){
+            const doorCard = new DoorCard(params);
+            console.log(doorCard)
+            let element = await doorCard.init()
+            this.#element.querySelector('#componentsCards').appendChild(element);
+            this.#components.set('doorCard',doorCard);
+          }
+          else{
+            let component = this.#components.get('doorCard');
+            component.updateStatus(params.value);
+          }
           break;
-        case 'HeatPump':
-          const heatPumpCard = new HeatPumpCard(componentParams);
+        case 'HeatPumpCard':
+          const heatPumpCard = new HeatPumpCard(params);
           heatPumpCard.init().then((element) => {
             this.#element.appendChild(element);
           });
           break;
         case 'WeatherCard':
-          const weatherCard = new WeatherCard(componentParams);
-          weatherCard.init().then((element) => {
+          if(!this.#components.get('weatherCard')){
+            const weatherCard = new WeatherCard(params);
+            let element = await weatherCard.init()
+            this.#element.querySelector('#componentsCards').appendChild(element);
+            this.#components.set('weatherCard',weatherCard);
+          }
+          else{
+            let component = this.#components.get('weatherCard');
+            component.updateTemperature(params.value);
+          }
+          break;
+        case 'ThermometerCard':
+          const thermometerCard = new ThermometerCard(params);
+          thermometerCard.init().then((element) => {
             this.#element.appendChild(element);
           });
           break;

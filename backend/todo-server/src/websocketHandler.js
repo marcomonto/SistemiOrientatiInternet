@@ -125,28 +125,15 @@ export class WebsocketHandler extends EventEmitter {
    * @param msg Any message
    * @private
    */
-  _send(msg) {
+  send(msg) {
     if (this.#config.failures && Math.random() < this.#config.errorProb) {
       console.info('🐛 There\'s a bug preventing the message to be sent', {handler: this.#name});
       return;
     }
-
-    console.debug('💬 Dispatching message', {handler: this.#name});
     this.#ws.send(JSON.stringify(msg));
   }
 
-  _onSubscribe() {
-    if (this.#timeout) {
-      return;
-    }
-
-    console.debug('🌡  Subscribing to temperature', {handler: this.#name});
-    const callback = () => {
-      this._getInfoSensors();
-      this.#timeout = setTimeout(callback, 5000);
-    };
-    this.#timeout = setTimeout(callback, 0);
-  }
+  _onSubscribe() {}
 
   _onUnsubscribe() {
     if (!this.#timeout) {
