@@ -41,8 +41,8 @@
   margin-right: 5px;
 }
 .circle {
-  width: 100px;
-  height: 100px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
   background-color: green;
   animation: pulse 2s infinite;

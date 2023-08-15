@@ -13,6 +13,9 @@ export function routes(app,wss,  config) {
   const authenticated = (req, res, next) => req.cookies?.tokenLookout ?
     (jwt.verify(req.cookies.tokenLookout , config.jwtSecretKey) ? next() : res.sendStatus(401)) :
     res.sendStatus(401);
+  const internalAuthentication =  (req, res, next) =>
+    req.params.token === 'ASKLJN739GSKHB098JKBHJBSADOIJLASBDIOPJAKJKBENaskmlasknflasmdnkln=2klasnddklnasd2klasmdmklasdjasdacapok2345435red'
+    ? next() : res.sendStatus(401);
 
   app.post('/api/login', (req, res) => {
     const {username, password} = req.body;
@@ -59,6 +62,17 @@ export function routes(app,wss,  config) {
     try {
       return res.json({
         success: true
+      })
+    } catch (e) {
+      console.log(e)
+    }
+  });
+
+  app.get('/api/sensors', internalAuthentication ,(req, res) => {
+    try {
+      return res.json({
+        success: true,
+        payload: memoryService.activeServices
       })
     } catch (e) {
       console.log(e)

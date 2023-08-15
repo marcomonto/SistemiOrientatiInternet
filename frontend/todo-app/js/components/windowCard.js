@@ -24,7 +24,7 @@
      */
     init() {
       this.#element = document.createElement('div');
-      this.#element.className = 'window-card';
+      this.#element.className = 'card';
 
       const title = document.createElement('h3');
       title.textContent = 'Window Information';

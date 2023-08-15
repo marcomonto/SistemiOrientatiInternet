@@ -16,6 +16,12 @@ export function subscribeToServices(services) {
       else if (service.serviceType === memoryService.serviceTypes.WINDOW) {
         ws.send(JSON.stringify({type:'subscribe'}));
       }
+      else if (service.serviceType === memoryService.serviceTypes.HEAT_PUMP) {
+        ws.send(JSON.stringify({type:'subscribe'}));
+      }
+      else if (service.serviceType === memoryService.serviceTypes.THERMOMETER) {
+        ws.send(JSON.stringify({type:'subscribe'}));
+      }
     });
     ws.on('message', (data) => {
       try{
@@ -30,7 +36,7 @@ export function subscribeToServices(services) {
             let activeServiceStored = memoryService.activeServices.find(el => el.id === service.id);
             activeServiceStored.lastScanAt = payload.dateTime;
             activeServiceStored.value = payload.value;
-            memoryService.getDatabaseConnection().store('temperatures',{value: Number(payload.value)});
+            memoryService.getDatabaseConnection().store('weatherTemperatures',{value: Number(payload.value)});
             memoryService.updateWebsocketClients(service.id)
           }
           else if (service.serviceType === memoryService.serviceTypes.DOOR){
@@ -40,6 +46,12 @@ export function subscribeToServices(services) {
             memoryService.updateWebsocketClients(service.id);
           }
           else if (service.serviceType === memoryService.serviceTypes.WINDOW){
+            let activeServiceStored = memoryService.activeServices.find(el => el.id === service.id);
+            activeServiceStored.lastScanAt = payload.dateTime;
+            activeServiceStored.status = payload.status;
+            memoryService.updateWebsocketClients(service.id);
+          }
+          else if (service.serviceType === memoryService.serviceTypes.HEAT_PUMP){
             let activeServiceStored = memoryService.activeServices.find(el => el.id === service.id);
             activeServiceStored.lastScanAt = payload.dateTime;
             activeServiceStored.status = payload.status;

@@ -72,6 +72,7 @@
         }));
         this.renderDynamicComponent('DoorCard');
         this.renderDynamicComponent('WindowCard');
+        this.renderDynamicComponent('HeatPumpCard');
       };
       socket.onmessage =  (event) => {
         console.log('Received message:', event.data);
@@ -114,7 +115,8 @@
         case 'WindowCard':
           if(!this.#components.get('windowCard')){
             const weatherCard = new WindowCard(params);
-            let element = await weatherCard.init()
+            let element = await weatherCard.init();
+            element.className = 'col-4';
             this.#element.querySelector('#componentsCards').appendChild(element);
             this.#components.set('windowCard',weatherCard);
           }
@@ -126,8 +128,8 @@
         case 'DoorCard':
           if(!this.#components.get('doorCard')){
             const doorCard = new DoorCard(params);
-            console.log(doorCard)
-            let element = await doorCard.init()
+            let element = await doorCard.init();
+            element.className = 'col-4';
             this.#element.querySelector('#componentsCards').appendChild(element);
             this.#components.set('doorCard',doorCard);
           }
@@ -137,15 +139,23 @@
           }
           break;
         case 'HeatPumpCard':
-          const heatPumpCard = new HeatPumpCard(params);
-          heatPumpCard.init().then((element) => {
-            this.#element.appendChild(element);
-          });
+          if(!this.#components.get('heatPumpCard')){
+            const heatPumpCard = new HeatPumpCard(params);
+            let element = await heatPumpCard.init()
+            element.className = 'col-4';
+            this.#element.querySelector('#componentsCards').appendChild(element);
+            this.#components.set('heatPumpCard',heatPumpCard);
+          }
+          else{
+            let component = this.#components.get('heatPumpCard');
+            component.updateTemperature(params.value);
+          }
           break;
         case 'WeatherCard':
           if(!this.#components.get('weatherCard')){
             const weatherCard = new WeatherCard(params);
             let element = await weatherCard.init()
+            element.className = 'col-4';
             this.#element.querySelector('#componentsCards').appendChild(element);
             this.#components.set('weatherCard',weatherCard);
           }

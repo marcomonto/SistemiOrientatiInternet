@@ -3,7 +3,7 @@
  */
 (function (win) {
 
-  class DoorCard extends EventEmitter {
+  class HeatPumpCard extends EventEmitter {
     /** @type {HTMLElement} */
     #element;
     /** @type {boolean} */
@@ -11,9 +11,6 @@
     /** @type {Handler[]} */
     #handlers = [];
 
-    /**
-     * Creates a new instance of `DoorCardComponent`.
-     */
     constructor(isOpen = true) {
       super();
       this.#isOpen = isOpen;
@@ -25,46 +22,29 @@
       this.#handlers.forEach(h => h.unregister());
       this.#element.remove();
     }
-    /**
-     * Initializes the component.
-     * @return {HTMLElement} The root element for this component.
-     */
     async init() {
       this.#element = document.createElement('div');
-      this.#element.className = 'card';
-      this.#element.setAttribute("style",
-        "  border-radius: 25px; border: 2px solid #73AD21;");
-
-      // TITLE
-      const title = document.createElement('div');
-      title.className = 'd-flex align-items-center';
-
-
-      const totalLabel = document.createElement('h5');
-      totalLabel.className = 'card-title mr-5';
-      totalLabel.textContent = 'Door'
-      totalLabel.setAttribute("style", "margin-right: 5px;");
-      title.appendChild(totalLabel);
+      this.#element.className = 'heat-pump-card';
 
       const icon = document.createElement('i');
-      icon.className = "bi bi-door-closed";
-      icon.setAttribute("style", "margin-right: 5px;");
-      title.appendChild(icon);
+      icon.className = 'bi-heat-pump';
+      this.#element.appendChild(icon);
 
       const circle = document.createElement('div');
       circle.className = 'circle';
-      title.appendChild(circle);
+      this.#element.appendChild(circle);
 
-      this.#element.appendChild(title);
-
-      //CARD BODY
       const cardBody = document.createElement('div');
       cardBody.className = 'card-body';
       this.#element.appendChild(cardBody);
 
+      const totalLabel = document.createElement('h5');
+      totalLabel.className = 'card-title';
+      totalLabel.textContent = 'Heat Pump'
+      this.#element.appendChild(totalLabel);
+
       const openedLabel = document.createElement('a');
       openedLabel.className = 'btn btn-primary';
-      openedLabel.textContent = 'Opened Doors:';
       this.#element.appendChild(openedLabel);
 
       const openedValue = document.createElement('span');
@@ -73,13 +53,13 @@
       this.#element.appendChild(openedValue);
 
       const openButton = document.createElement('button');
-      openButton.textContent = 'Open Door';
+      openButton.textContent = 'Open Heat Pump';
       const openHandler = new Handler('click', openButton, () => this.openDoor());
       this.#handlers.push(openHandler);
       this.#element.appendChild(openButton);
 
       const closeButton = document.createElement('button');
-      closeButton.textContent = 'Close Door';
+      closeButton.textContent = 'Close Heat Pump';
       const closeHandler = new Handler('click', closeButton, () => this.closeDoor());
       this.#handlers.push(closeHandler);
       this.#element.appendChild(closeButton);
@@ -112,14 +92,6 @@
   }
 
   /* Exporting component */
-  win.DoorCard ||= DoorCard;
+  win.HeatPumpCard ||= HeatPumpCard;
 
 })(window);
-/*// Example usage
-const totalDoors = 3;
-const openedDoors = 1;
-
-const doorCard = new DoorCardComponent(totalDoors, openedDoors);
-const doorCardElement = doorCard.init();
-
-document.getElementById('door-card-container').appendChild(doorCardElement);*/

@@ -23,7 +23,7 @@
      */
     init() {
       this.#element = document.createElement('div');
-      this.#element.className = 'card temperature-card';
+      this.#element.className = 'card';
       this.#element.id = 'weatherCard';
 
       const title = document.createElement('h3');
