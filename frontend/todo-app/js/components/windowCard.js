@@ -5,17 +5,22 @@
   class WindowCard extends EventEmitter{
     /** @type {HTMLElement} */
     #element;
-    /** @type {boolean} */
-    #isOpened;
+    /** @type {string} */
+    #status;
+    /** @type {number} */
+    #serviceId;
     /** @type {Handler[]} */
     #handlers = [];
+    #client;
 
     /**
      * Creates a new instance of `WindowCardComponent`.
      */
-    constructor( isOpen= true) {
+    constructor(client, params) {
       super();
-      this.#isOpened = isOpen;
+      this.#client = client;
+      this.#status = params.status;
+      this.#serviceId = params.id;
     }
 
     /**
@@ -25,34 +30,40 @@
     init() {
       this.#element = document.createElement('div');
       this.#element.className = 'card';
+      this.#element.setAttribute("style",
+        "  border-radius: 25px; border: 2px solid #73AD21;");
 
-      const title = document.createElement('h3');
-      title.textContent = 'Window Information';
+      // TITLE
+      const title = document.createElement('div');
+      title.className = 'd-flex align-items-center';
+
+
+      const totalLabel = document.createElement('h5');
+      totalLabel.className = 'card-title mr-5';
+      totalLabel.textContent = 'Door'
+      totalLabel.setAttribute("style", "margin-right: 5px;");
+      title.appendChild(totalLabel);
+
+      const icon = document.createElement('i');
+      icon.className = "bi bi-shop-window";
+      icon.setAttribute("style", "margin-right: 5px;");
+      title.appendChild(icon);
+
+      const circle = document.createElement('div');
+      circle.className = 'circle';
+      title.appendChild(circle);
+
       this.#element.appendChild(title);
 
-      const totalLabel = document.createElement('span');
-      totalLabel.textContent = 'Total Windows:';
-      this.#element.appendChild(totalLabel);
+      //CARD BODY
+      const cardBody = document.createElement('div');
+      cardBody.className = 'card-body';
+      this.#element.appendChild(cardBody);
 
-      const openedLabel = document.createElement('span');
-      openedLabel.textContent = 'Opened Windows:';
+      const openedLabel = document.createElement('a');
+      openedLabel.className = 'btn btn-primary';
+      openedLabel.textContent = (this.#status === 'CLOSED' || this.#status === 'ERROR') ? 'Open' : 'close';
       this.#element.appendChild(openedLabel);
-
-      const openedValue = document.createElement('span');
-      openedValue.textContent = this.#isOpened ? 'Open' : 'Closed';
-      this.#element.appendChild(openedValue);
-
-      const openButton = document.createElement('button');
-      openButton.textContent = 'Open Window';
-      const openHandler = new Handler('click', openButton, () => this.openWindow());
-      this.#handlers.push(openHandler);
-      this.#element.appendChild(openButton);
-
-      const closeButton = document.createElement('button');
-      closeButton.textContent = 'Close Window';
-      const closeHandler = new Handler('click', closeButton, () => this.closeWindow());
-      this.#handlers.push(closeHandler);
-      this.#element.appendChild(closeButton);
 
       return this.#element;
     }

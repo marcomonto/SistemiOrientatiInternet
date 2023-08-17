@@ -2,6 +2,7 @@
 
 import {WindowHandler} from './window-handler.js';
 import {v4 as uuid} from 'uuid';
+import memoryService from "./memoryService.js";
 
 /**
  * Registers a new handler for the WS channel.
@@ -66,11 +67,26 @@ export function routes(app, wss, config) {
 
   wss.on('connection', ws => {
     try {
-      const handler = new WindowHandler(ws, config, `weather:${uuid()}`);
+      const handler = new WindowHandler(ws, config, 'window');
       registerHandler(ws, handler);
     } catch (e) {
       console.error('💥 Failed to register WS handler, closing connection', e);
       ws.close();
+    }
+  });
+
+
+  app.put('/api/status',async (req, res) => {
+    try{
+      memoryService.setStatus(req.body.newStatus);
+      return {
+        success: true
+      };
+    }
+    catch (e){
+      return {
+        success: false
+      }
     }
   });
 }

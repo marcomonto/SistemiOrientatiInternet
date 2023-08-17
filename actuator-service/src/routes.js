@@ -1,8 +1,9 @@
 'use strict';
 
-import {WebsocketHandler} from './websocket-handler.js';
+import {WebSocketHandler} from './webSocketHandler.js';
 import {v4 as uuid} from 'uuid';
 import memoryService from "./memoryService.js";
+import axios from "axios";
 
 /**
  * Registers a new handler for the WS channel.
@@ -67,7 +68,7 @@ export function routes(app, wss, config) {
 
   wss.on('connection', ws => {
     try {
-      const handler = new WebsocketHandler(ws, config, `weather:${uuid()}`);
+      const handler = new WebSocketHandler(ws, config, `weather:${uuid()}`);
       registerHandler(ws, handler);
     } catch (e) {
       console.error('💥 Failed to register WS handler, closing connection', e);
@@ -75,17 +76,17 @@ export function routes(app, wss, config) {
     }
   });
 
-  app.put('/api/status',async (req, res) => {
-    try{
-      memoryService.setStatus(req.body.newStatus);
-      return {
-        success: true
-      };
-    }
-    catch (e){
-      return {
-        success: false
-      }
-    }
+  app.post('/api/sensor/:id',async (req, res) => {
+    let serviceToCall = memoryService.connections.find(el => el.index == req.params.id);
+    const payload = req.body;
+    if(!serviceToCall)
+      return res.sendStatus(403);
+    const address = serviceToCall.address
+    let responseFromService = await axios.post(address,{
+      newStatus: payload.newStatus
+    });
+    return {
+      success: true
+    };
   });
 }

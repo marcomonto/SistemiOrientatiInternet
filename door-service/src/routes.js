@@ -2,6 +2,7 @@
 
 import {DoorHandler} from './door-handler.js';
 import {v4 as uuid} from 'uuid';
+import memoryService from "./memoryService.js";
 
 /**
  * Registers a new handler for the WS channel.
@@ -71,6 +72,20 @@ export function routes(app, wss, config) {
     } catch (e) {
       console.error('💥 Failed to register WS handler, closing connection', e);
       ws.close();
+    }
+  });
+
+  app.put('/api/status',async (req, res) => {
+    try{
+      memoryService.setStatus(req.body.newStatus);
+        return {
+        success: true
+      };
+          }
+    catch (e){
+      return {
+        success: false
+      }
     }
   });
 }

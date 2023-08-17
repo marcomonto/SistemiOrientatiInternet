@@ -1,5 +1,3 @@
-import {Observable} from 'rxjs';
-
 class MemoryService {
 
   connections = [];
@@ -35,7 +33,6 @@ class MemoryService {
   }
 
   sendMessageToClient(msg) {
-    console.log(this.websocketClientHandler)
     /*   if(!!this.websocketClientHandler)
          this.websocketClientHandler._send(JSON.stringify(msg))
        else
@@ -53,6 +50,7 @@ class MemoryService {
             value: service.value, // it will be undefined if not weatherService
             lastScanAt: service.lastScanAt,
             status: service.status, // it will be undefined if it is weatherService
+            id: service.id
           }
         }
       );

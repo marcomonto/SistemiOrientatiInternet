@@ -7,13 +7,15 @@
     #currentTemperature;
     /** @type {Handler[]} */
     #handlers = [];
+    #client;
 
     /**
      * Creates a new instance of `TemperatureCardComponent`.
      * @params {} Payload.
      */
-    constructor(params) {
+    constructor(client, params) {
       super();
+      this.#client = client;
       this.#currentTemperature = params.value;
     }
 

@@ -1,22 +1,34 @@
 /**
  * A card component to display door information.
  */
+
 (function (win) {
 
   class DoorCard extends EventEmitter {
     /** @type {HTMLElement} */
     #element;
-    /** @type {boolean} */
-    #isOpen;
+    /** @type {string} */
+    #status;
+    /** @type {number} */
+    #serviceId;
     /** @type {Handler[]} */
     #handlers = [];
+    #client;
+    /** @type {[]} */
+    #rxjsSubscriptions = [];
+    #statusObserver;
+    #waitingForResponse = false;
+
 
     /**
      * Creates a new instance of `DoorCardComponent`.
      */
-    constructor(isOpen = true) {
+    constructor(client, params) {
       super();
-      this.#isOpen = isOpen;
+      this.#client = client;
+      this.#status = params.status;
+      this.#serviceId = params.id;
+      this.registerRenderComponents()
     }
     /**
      * Destroys this component, removing it from it's parent node.
@@ -32,8 +44,11 @@
     async init() {
       this.#element = document.createElement('div');
       this.#element.className = 'card';
+      this.#element.id = 'card_' + this.#serviceId;
       this.#element.setAttribute("style",
-        "  border-radius: 25px; border: 2px solid #73AD21;");
+        (this.#status === 'CLOSED' || this.#status === 'ERROR') ?
+          "border-radius: 25px; border: 2px solid yellow;" :
+          "border-radius: 25px; border: 2px solid #73AD21;");
 
       // TITLE
       const title = document.createElement('div');
@@ -47,7 +62,8 @@
       title.appendChild(totalLabel);
 
       const icon = document.createElement('i');
-      icon.className = "bi bi-door-closed";
+      icon.id = "iconCard_" + this.#serviceId;
+      icon.className = (this.#status === 'CLOSED' || this.#status === 'ERROR') ? "bi bi-door-closed" : 'bi bi-door-open';
       icon.setAttribute("style", "margin-right: 5px;");
       title.appendChild(icon);
 
@@ -63,51 +79,62 @@
       this.#element.appendChild(cardBody);
 
       const openedLabel = document.createElement('a');
+      openedLabel.id = 'buttonCard_' + this.#serviceId;
       openedLabel.className = 'btn btn-primary';
-      openedLabel.textContent = 'Opened Doors:';
+      openedLabel.textContent = (this.#status === 'CLOSED' || this.#status === 'ERROR') ? 'Open' : 'Close Door';
       this.#element.appendChild(openedLabel);
-
-      const openedValue = document.createElement('span');
-      openedValue.textContent = this.#isOpen ? 'Opened' : 'Closed';
-      openedValue.className = 'opened-doors-value';
-      this.#element.appendChild(openedValue);
-
-      const openButton = document.createElement('button');
-      openButton.textContent = 'Open Door';
-      const openHandler = new Handler('click', openButton, () => this.openDoor());
-      this.#handlers.push(openHandler);
-      this.#element.appendChild(openButton);
-
-      const closeButton = document.createElement('button');
-      closeButton.textContent = 'Close Door';
-      const closeHandler = new Handler('click', closeButton, () => this.closeDoor());
-      this.#handlers.push(closeHandler);
-      this.#element.appendChild(closeButton);
 
       return this.#element;
     }
-
-    /**
-     * Opens a door and updates the displayed count.
-     */
-    openDoor() {
-      this.#isOpen = !this.#isOpen;
-      this.updateDoorCount();
+    async buttonStatusClicked() {
+      try{
+        if(this.#waitingForResponse)
+          return;
+        this.#waitingForResponse = true;
+        //let response = await axios.put();
+        this.#waitingForResponse = false;
+      }
+      catch (e) {
+        console.log(e)
+        this.#waitingForResponse = false;
+      }
     }
-
-    /**
-     * Closes a door and updates the displayed count.
-     */
-    closeDoor() {
-      this.#isOpen = !this.#isOpen;
-      this.updateDoorCount();
+    update(payload) {
+      if(!!payload.status)
+        this.#statusObserver.next({
+          valueType: 'STATUS',
+          value: payload.status
+        })
     }
-
-    /**
-     * Updates the displayed count of opened doors.
-     */
-    updateDoorCount() {
-      const openedValue = this.#element.querySelector('.opened-doors-value');
+    registerRenderComponents() {
+      const { BehaviorSubject } = rxjs;
+      const statusObserver = new BehaviorSubject(this.#status); //initialValue
+      const statusSubscription = statusObserver.subscribe(newValue => {
+        if(newValue.valueType === 'STATUS' && newValue.value !== this.#status){
+          let elementToUpdate = document.querySelector('#card_' + this.#serviceId);
+          let iconToUpdate = document.querySelector('#iconCard_' + this.#serviceId);
+          let buttonToUpdate = document.querySelector('#buttonCard_' + this.#serviceId);
+          switch (newValue.valueType) {
+            case 'on':
+              elementToUpdate.setAttribute("style", "border-radius: 25px; border: 2px solid #73AD21;");
+              iconToUpdate.className = 'bi bi-door-open';
+              buttonToUpdate.textContent = 'Close'
+              break;
+            case 'off':
+              elementToUpdate.setAttribute("style", "border-radius: 25px; border: 2px solid red;");
+              iconToUpdate.className = 'bi bi-door-close';
+              buttonToUpdate.textContent = 'Open'
+              break;
+            case 'error':
+              elementToUpdate.setAttribute("style", "border-radius: 25px; border: 2px solid red;");
+              iconToUpdate.className = 'bi bi-door-open';
+              buttonToUpdate.textContent = 'Open'
+              break;
+          }
+        }
+      });
+      this.#rxjsSubscriptions.push(statusSubscription)
+      this.#statusObserver = statusObserver;
     }
   }
 
@@ -115,11 +142,3 @@
   win.DoorCard ||= DoorCard;
 
 })(window);
-/*// Example usage
-const totalDoors = 3;
-const openedDoors = 1;
-
-const doorCard = new DoorCardComponent(totalDoors, openedDoors);
-const doorCardElement = doorCard.init();
-
-document.getElementById('door-card-container').appendChild(doorCardElement);*/

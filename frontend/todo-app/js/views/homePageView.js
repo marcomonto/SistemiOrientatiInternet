@@ -1,18 +1,5 @@
 `use strict`;
 (function (win) {
-  class ActiveService {
-    #id;
-    #params;
-
-    constructor(id, params) {
-      this.#id = id;
-      this.#params = params;
-    }
-  }
-
-  /**
-   * A login component.
-   */
   class HomePageComponent extends EventEmitter {
     /** @type {HTMLElement} */
     #element;
@@ -70,9 +57,6 @@
         socket.send(JSON.stringify({
           type: 'subscribe'
         }));
-        this.renderDynamicComponent('DoorCard');
-        this.renderDynamicComponent('WindowCard');
-        this.renderDynamicComponent('HeatPumpCard');
       };
       socket.onmessage =  (event) => {
         console.log('Received message:', event.data);
@@ -114,49 +98,49 @@
       switch (componentType) {
         case 'WindowCard':
           if(!this.#components.get('windowCard')){
-            const weatherCard = new WindowCard(params);
+            const weatherCard = new WindowCard(this.#client, params);
             let element = await weatherCard.init();
             element.className = 'col-4';
-            this.#element.querySelector('#componentsCards').appendChild(element);
+            this.#element.querySelector('#sensorCards').appendChild(element);
             this.#components.set('windowCard',weatherCard);
           }
           else{
             let component = this.#components.get('windowCard');
-            component.updateStatus(params.value);
+            component.update(params);
           }
           break;
         case 'DoorCard':
           if(!this.#components.get('doorCard')){
-            const doorCard = new DoorCard(params);
+            const doorCard = new DoorCard(this.#client, params);
             let element = await doorCard.init();
             element.className = 'col-4';
-            this.#element.querySelector('#componentsCards').appendChild(element);
+            this.#element.querySelector('#sensorCards').appendChild(element);
             this.#components.set('doorCard',doorCard);
           }
           else{
             let component = this.#components.get('doorCard');
-            component.updateStatus(params.value);
+            component.update(params);
           }
           break;
         case 'HeatPumpCard':
           if(!this.#components.get('heatPumpCard')){
-            const heatPumpCard = new HeatPumpCard(params);
+            const heatPumpCard = new HeatPumpCard(this.#client, params);
             let element = await heatPumpCard.init()
             element.className = 'col-4';
-            this.#element.querySelector('#componentsCards').appendChild(element);
+            this.#element.querySelector('#sensorCards').appendChild(element);
             this.#components.set('heatPumpCard',heatPumpCard);
           }
           else{
             let component = this.#components.get('heatPumpCard');
-            component.updateTemperature(params.value);
+            component.update(params);
           }
           break;
         case 'WeatherCard':
           if(!this.#components.get('weatherCard')){
-            const weatherCard = new WeatherCard(params);
+            const weatherCard = new WeatherCard(this.#client, params);
             let element = await weatherCard.init()
-            element.className = 'col-4';
-            this.#element.querySelector('#componentsCards').appendChild(element);
+            element.className = 'col-6';
+            this.#element.querySelector('#temperatureCards').appendChild(element);
             this.#components.set('weatherCard',weatherCard);
           }
           else{
@@ -165,7 +149,7 @@
           }
           break;
         case 'ThermometerCard':
-          const thermometerCard = new ThermometerCard(params);
+          const thermometerCard = new ThermometerCard(this.#client, params);
           thermometerCard.init().then((element) => {
             this.#element.appendChild(element);
           });
