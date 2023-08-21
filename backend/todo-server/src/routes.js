@@ -51,7 +51,6 @@ export function routes(app,wss,  config) {
     try {
       return res.json({
         success: true,
-        payload: 'ciao'
       })
     } catch (e) {
       console.log(e)
@@ -77,6 +76,20 @@ export function routes(app,wss,  config) {
     } catch (e) {
       console.log(e)
     }
+  });
+
+  app.put('/api/sensor/:id', authenticated, async (req, res) => {
+    let serviceToCall = memoryService.connections.find(el => el.index == req.params.id);
+    const payload = req.body;
+    if(!serviceToCall)
+      return res.sendStatus(403);
+    const address = serviceToCall.address
+    let responseFromService = await axios.post(address,{
+      newStatus: payload.newStatus
+    });
+    return {
+      success: true
+    };
   });
 
   wss.on('connection', (ws, req) => {

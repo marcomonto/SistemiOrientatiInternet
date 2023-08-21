@@ -91,7 +91,9 @@
         if(this.#waitingForResponse)
           return;
         this.#waitingForResponse = true;
-        //let response = await axios.put();
+        let response = await this.#client.put('sensor/' + this.#serviceId, {
+          newStatus: (this.#status === 'CLOSED') ? ''
+        });
         this.#waitingForResponse = false;
       }
       catch (e) {
