@@ -20,6 +20,3 @@ EXPOSE 8085
 
 # start PocketBase
 CMD ["/pb/pocketbase", "serve", "--http=0.0.0.0:8085"]
-
-# start PocketBase prova@mail.com psw: provaprova
-#CMD ["./pocketbase", "serve", "--http=0.0.0.0:8085"]

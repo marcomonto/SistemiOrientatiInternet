@@ -11,6 +11,8 @@
     #status;
     /** @type {number} */
     #serviceId;
+    /** @type {string} */
+    #lastScanAt;
     /** @type {Handler[]} */
     #handlers = [];
     #client;
@@ -28,6 +30,7 @@
       this.#client = client;
       this.#status = params.status;
       this.#serviceId = params.id;
+      this.#lastScanAt = params.lastScanAt;
       this.registerRenderComponents()
     }
     /**
@@ -53,11 +56,13 @@
       // TITLE
       const title = document.createElement('div');
       title.className = 'd-flex align-items-center';
+      title.setAttribute("style",
+          "padding: 5px;");
 
 
       const totalLabel = document.createElement('h5');
       totalLabel.className = 'card-title mr-5';
-      totalLabel.textContent = 'Door'
+      totalLabel.textContent = 'Door #' + this.#serviceId;
       totalLabel.setAttribute("style", "margin-right: 5px;");
       title.appendChild(totalLabel);
 
@@ -71,11 +76,19 @@
       circle.className = 'circle';
       title.appendChild(circle);
 
+      const labelLastScanAt = document.createElement('div');
+      labelLastScanAt.id = "lastScanAtCard_" + this.#serviceId;
+      labelLastScanAt.setAttribute("style", "margin-left: 30px;");
+      labelLastScanAt.textContent = this.#lastScanAt.substring(11,19);
+      title.appendChild(labelLastScanAt);
+
       this.#element.appendChild(title);
 
       //CARD BODY
       const cardBody = document.createElement('div');
       cardBody.className = 'card-body';
+      cardBody.setAttribute("style",
+        "padding-bottom: 5px;");
       this.#element.appendChild(cardBody);
 
       const openedLabel = document.createElement('a');
@@ -92,7 +105,7 @@
           return;
         this.#waitingForResponse = true;
         let response = await this.#client.put('sensor/' + this.#serviceId, {
-          newStatus: (this.#status === 'CLOSED') ? ''
+          newStatus: (this.#status === 'ON') ? 'off' : 'on'
         });
         this.#waitingForResponse = false;
       }
@@ -104,36 +117,40 @@
     update(payload) {
       if(!!payload.status)
         this.#statusObserver.next({
-          valueType: 'STATUS',
-          value: payload.status
+          status: payload.status,
+          lastScanAt: payload.lastScanAt
         })
     }
     registerRenderComponents() {
       const { BehaviorSubject } = rxjs;
       const statusObserver = new BehaviorSubject(this.#status); //initialValue
-      const statusSubscription = statusObserver.subscribe(newValue => {
-        if(newValue.valueType === 'STATUS' && newValue.value !== this.#status){
+      const statusSubscription = statusObserver.subscribe(payload => {
+        if(payload.status !== this.#status){
           let elementToUpdate = document.querySelector('#card_' + this.#serviceId);
           let iconToUpdate = document.querySelector('#iconCard_' + this.#serviceId);
           let buttonToUpdate = document.querySelector('#buttonCard_' + this.#serviceId);
-          switch (newValue.valueType) {
+          switch (payload.status) {
             case 'on':
               elementToUpdate.setAttribute("style", "border-radius: 25px; border: 2px solid #73AD21;");
               iconToUpdate.className = 'bi bi-door-open';
               buttonToUpdate.textContent = 'Close'
               break;
             case 'off':
-              elementToUpdate.setAttribute("style", "border-radius: 25px; border: 2px solid red;");
-              iconToUpdate.className = 'bi bi-door-close';
+              elementToUpdate.setAttribute("style", "border-radius: 25px; border: 2px solid grey;");
+              iconToUpdate.className = 'bi bi-door-closed';
               buttonToUpdate.textContent = 'Open'
               break;
             case 'error':
               elementToUpdate.setAttribute("style", "border-radius: 25px; border: 2px solid red;");
               iconToUpdate.className = 'bi bi-door-open';
-              buttonToUpdate.textContent = 'Open'
+              buttonToUpdate.textContent = 'Try to reconnect'
               break;
           }
+          this.#status = payload.status
         }
+        let lastScanToUpdate = document.querySelector('#lastScanAtCard_' + this.#serviceId);
+        lastScanToUpdate.textContent = payload.lastScanAt.substring(11,19);
+        this.#lastScanAt = payload.lastScanAt.substring(11,19);
       });
       this.#rxjsSubscriptions.push(statusSubscription)
       this.#statusObserver = statusObserver;
