@@ -1,6 +1,6 @@
 'use strict';
 
-import {DoorHandler} from './door-handler.js';
+import {WebSocketHandler} from './webSocketHandler.js';
 import {v4 as uuid} from 'uuid';
 import memoryService from "./memoryService.js";
 
@@ -67,7 +67,7 @@ export function routes(app, wss, config) {
 
   wss.on('connection', ws => {
     try {
-      const handler = new DoorHandler(ws, config, `weather:${uuid()}`);
+      const handler = new WebSocketHandler(ws, config, `weather:${uuid()}`);
       registerHandler(ws, handler);
     } catch (e) {
       console.error('💥 Failed to register WS handler, closing connection', e);

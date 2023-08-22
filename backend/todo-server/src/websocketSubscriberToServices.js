@@ -41,20 +41,21 @@ export function subscribeToServices(services) {
           }
           else if (service.serviceType === memoryService.serviceTypes.DOOR){
             let activeServiceStored = memoryService.activeServices.find(el => el.id === service.id);
-            activeServiceStored.lastScanAt = payload.dateTime;
+            activeServiceStored.lastScanAt = payload.lastScanAt;
             activeServiceStored.status = payload.status;
             memoryService.updateWebsocketClients(service.id);
           }
           else if (service.serviceType === memoryService.serviceTypes.WINDOW){
             let activeServiceStored = memoryService.activeServices.find(el => el.id === service.id);
-            activeServiceStored.lastScanAt = payload.dateTime;
+            activeServiceStored.lastScanAt = payload.lastScanAt;
             activeServiceStored.status = payload.status;
             memoryService.updateWebsocketClients(service.id);
           }
           else if (service.serviceType === memoryService.serviceTypes.HEAT_PUMP){
             let activeServiceStored = memoryService.activeServices.find(el => el.id === service.id);
-            activeServiceStored.lastScanAt = payload.dateTime;
+            activeServiceStored.lastScanAt = payload.lastScanAt;
             activeServiceStored.status = payload.status;
+            activeServiceStored.workingTemperature = payload.workingTemperature;
             memoryService.updateWebsocketClients(service.id);
           }
         }

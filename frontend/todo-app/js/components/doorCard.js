@@ -59,7 +59,6 @@
       title.setAttribute("style",
           "padding: 5px;");
 
-
       const totalLabel = document.createElement('h5');
       totalLabel.className = 'card-title mr-5';
       totalLabel.textContent = 'Door #' + this.#serviceId;

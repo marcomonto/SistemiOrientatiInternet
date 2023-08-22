@@ -6,11 +6,16 @@ class MemoryService {
     ERROR: 'error'
   };
   #status = this.statusEnum.OFF
+  #workingTemperature = 30;
 
   constructor() {}
 
   getStatus(){
     return this.#status;
+  }
+
+  getWorkingTemperature(){
+    return this.#workingTemperature;
   }
   /**
    Sets the new status.
@@ -22,4 +27,3 @@ class MemoryService {
   }
 
 } export default new MemoryService()
-

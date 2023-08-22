@@ -1,6 +1,5 @@
 'use strict';
 
-import {DateTime} from 'luxon';
 import {EventEmitter} from 'events';
 import memoryService from "./memoryService.js";
 
@@ -17,10 +16,7 @@ class ValidationError extends Error {
   }
 }
 
-/**
- * A WebSocket handler to deal with weather subscriptions.
- */
-export class WebsocketHandler extends EventEmitter {
+export class WebSocketHandler extends EventEmitter {
   #ws;
   #config;
   #name;
@@ -59,10 +55,17 @@ export class WebsocketHandler extends EventEmitter {
       this._send({error: e.message});
       return;
     }
+
+    // @formatter:off
     switch (json.type) {
-      case 'subscribe': this._onSubscribe(); break;
-      case 'unsubscribe': this._onUnsubscribe(); break;
+      case 'subscribe':
+        this._onSubscribe();
+        break;
+      case 'unsubscribe':
+        this._onUnsubscribe();
+        break;
     }
+    // @formatter:on
   }
 
   stop() {
@@ -76,7 +79,7 @@ export class WebsocketHandler extends EventEmitter {
 
   start() {
     console.debug('New connection received', {handler: this.#name});
-    // simulate a client disconnection
+
     if (this.#config.failures && this.#config.timeToLive > 0) {
       //this._scheduleDeath();
     }
@@ -92,6 +95,13 @@ export class WebsocketHandler extends EventEmitter {
       this.emit('error', 'Simulated death', {handler: this.#name});
     }, secs * 1000);
   }
+
+  /**
+   * Validates an incoming message.
+   * @param msg {string} Any message string that can be parsed as JSON
+   * @return {any} An object representing the incoming message
+   * @private
+   */
   _validateMessage(msg) {
     if (!msg) {
       throw new ValidationError('Invalid inbound message');
@@ -102,18 +112,32 @@ export class WebsocketHandler extends EventEmitter {
     }
     return json;
   }
+
+  /**
+   * Generates a random delay in milliseconds.
+   * @return {number} Milliseconds
+   * @private
+   */
+
+  /*
+  _someMillis() {
+    return anIntegerWithPrecision(this.#config.frequency, 0.2);
+  }
+*/
+
+  /**
+   * Sends the temperature message.
+   * @private
+   */
   _sendData() {
     const msg = {
-      type: 'heatPump', payload: {
-        dateTime: (new Date()).toISOString(),
+      type: 'door', payload: {
+        lastScanAt: (new Date()).toISOString(),
         status: memoryService.getStatus()
       }
     };
-    // message is always appended to the buffer
     this.#buffer.push(msg);
 
-    // messages are dispatched immediately if delays are disabled or a random number is
-    // generated greater than `delayProb` messages
     if (!this.#config.delays || Math.random() > this.#config.delayProb) {
       for (const bMsg of this.#buffer) {
         this._send(bMsg);
@@ -124,6 +148,11 @@ export class WebsocketHandler extends EventEmitter {
     }
   }
 
+  /**
+   * Sends any message through the WebSocket channel.
+   * @param msg Any message
+   * @private
+   */
   _send(msg) {
     if (this.#config.failures && Math.random() < this.#config.errorProb) {
       console.info('🐛 There\'s a bug preventing the message to be sent', {handler: this.#name});
@@ -139,6 +168,7 @@ export class WebsocketHandler extends EventEmitter {
       return;
     }
 
+    console.debug('🌡  Subscribing to temperature', {handler: this.#name});
     const callback = () => {
       this._sendData();
       this.#timeout = setTimeout(callback, 5000);

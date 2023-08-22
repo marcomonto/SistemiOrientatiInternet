@@ -21,6 +21,4 @@ class MemoryService {
     ];
   }
 
-
 } export default new MemoryService()
-

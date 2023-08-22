@@ -1,6 +1,6 @@
 'use strict';
 
-import {WindowHandler} from './window-handler.js';
+import {WebSocketHandler} from './webSocketHandler.js';
 import {v4 as uuid} from 'uuid';
 import memoryService from "./memoryService.js";
 
@@ -67,7 +67,7 @@ export function routes(app, wss, config) {
 
   wss.on('connection', ws => {
     try {
-      const handler = new WindowHandler(ws, config, 'window');
+      const handler = new WebSocketHandler(ws, config, 'window');
       registerHandler(ws, handler);
     } catch (e) {
       console.error('💥 Failed to register WS handler, closing connection', e);

@@ -6,6 +6,7 @@ const directories = [
   "door-service",
   "weather-service-master",
   "window-service",
+  "heatPump-service",
   "backend/todo-server",
   "frontend/todo-app",
 ];
@@ -13,7 +14,7 @@ const directories = [
 (async function () {
   for (const dir of directories)
     if(dir != 'pocketbase')
-      setTimeout(() => startInDirectory(dir), 1000);
+      setTimeout(() => startInDirectory(dir), 2000);
   else startInDirectory(dir)
 })();
 

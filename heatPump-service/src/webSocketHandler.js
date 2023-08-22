@@ -20,7 +20,7 @@ class ValidationError extends Error {
 /**
  * A WebSocket handler to deal with weather subscriptions.
  */
-export class DoorHandler extends EventEmitter {
+export class WebSocketHandler extends EventEmitter {
   #ws;
   #config;
   #name;
@@ -111,24 +111,12 @@ export class DoorHandler extends EventEmitter {
     return json;
   }
 
-  /**
-   * Generates a random delay in milliseconds.
-   * @return {number} Milliseconds
-   * @private
-   */
-/*  _someMillis() {
-    return anIntegerWithPrecision(this.#config.frequency, 0.2);
-  }*/
-
-  /**
-   * Sends the temperature message.
-   * @private
-   */
   _sendData() {
     const msg = {
       type: 'door', payload: {
-        dateTime: (new Date()).toISOString(),
-        status: memoryService.getStatus()
+        lastScanAt: (new Date()).toISOString(),
+        status: memoryService.getStatus(),
+        workingTemperature: memoryService.getWorkingTemperature()
       }
     };
     // message is always appended to the buffer
@@ -146,11 +134,6 @@ export class DoorHandler extends EventEmitter {
     }
   }
 
-  /**
-   * Sends any message through the WebSocket channel.
-   * @param msg Any message
-   * @private
-   */
   _send(msg) {
     if (this.#config.failures && Math.random() < this.#config.errorProb) {
       console.info('🐛 There\'s a bug preventing the message to be sent', {handler: this.#name});

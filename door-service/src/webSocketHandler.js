@@ -1,5 +1,6 @@
 'use strict';
 
+import {DateTime} from 'luxon';
 import {EventEmitter} from 'events';
 import memoryService from "./memoryService.js";
 
@@ -16,7 +17,10 @@ class ValidationError extends Error {
   }
 }
 
-export class WindowHandler extends EventEmitter {
+/**
+ * A WebSocket handler to deal with weather subscriptions.
+ */
+export class WebSocketHandler extends EventEmitter {
   #ws;
   #config;
   #name;
@@ -55,17 +59,10 @@ export class WindowHandler extends EventEmitter {
       this._send({error: e.message});
       return;
     }
-
-    // @formatter:off
     switch (json.type) {
-      case 'subscribe':
-        this._onSubscribe();
-        break;
-      case 'unsubscribe':
-        this._onUnsubscribe();
-        break;
+      case 'subscribe': this._onSubscribe(); break;
+      case 'unsubscribe': this._onUnsubscribe(); break;
     }
-    // @formatter:on
   }
 
   stop() {
@@ -80,6 +77,7 @@ export class WindowHandler extends EventEmitter {
   start() {
     console.debug('New connection received', {handler: this.#name});
 
+    // simulate a client disconnection
     if (this.#config.failures && this.#config.timeToLive > 0) {
       //this._scheduleDeath();
     }
@@ -118,12 +116,9 @@ export class WindowHandler extends EventEmitter {
    * @return {number} Milliseconds
    * @private
    */
-
-  /*
-  _someMillis() {
+/*  _someMillis() {
     return anIntegerWithPrecision(this.#config.frequency, 0.2);
-  }
-*/
+  }*/
 
   /**
    * Sends the temperature message.
@@ -132,12 +127,15 @@ export class WindowHandler extends EventEmitter {
   _sendData() {
     const msg = {
       type: 'door', payload: {
-        dateTime: (new Date()).toISOString(),
+        lastScanAt: (new Date()).toISOString(),
         status: memoryService.getStatus()
       }
     };
+    // message is always appended to the buffer
     this.#buffer.push(msg);
 
+    // messages are dispatched immediately if delays are disabled or a random number is
+    // generated greater than `delayProb` messages
     if (!this.#config.delays || Math.random() > this.#config.delayProb) {
       for (const bMsg of this.#buffer) {
         this._send(bMsg);
@@ -168,7 +166,6 @@ export class WindowHandler extends EventEmitter {
       return;
     }
 
-    console.debug('🌡  Subscribing to temperature', {handler: this.#name});
     const callback = () => {
       this._sendData();
       this.#timeout = setTimeout(callback, 5000);
