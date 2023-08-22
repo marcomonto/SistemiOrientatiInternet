@@ -93,7 +93,7 @@
       const openedLabel = document.createElement('a');
       openedLabel.id = 'buttonCard_' + this.#serviceId;
       openedLabel.className = 'btn btn-primary';
-      openedLabel.textContent = (this.#status === 'CLOSED' || this.#status === 'ERROR') ? 'Open' : 'Close Door';
+      openedLabel.textContent = (this.#status === 'off' || this.#status === 'error') ? 'Open' : 'Close Door';
       this.#element.appendChild(openedLabel);
 
       return this.#element;
@@ -104,7 +104,7 @@
           return;
         this.#waitingForResponse = true;
         let response = await this.#client.put('sensor/' + this.#serviceId, {
-          newStatus: (this.#status === 'ON') ? 'off' : 'on'
+          newStatus: (this.#status === 'on') ? 'off' : 'on'
         });
         this.#waitingForResponse = false;
       }
