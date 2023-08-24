@@ -136,23 +136,18 @@
           }
           break;
         case 'WeatherCard':
+        case 'ThermometerCard':
           if(!this.#components.get('weatherCard')){
             const weatherCard = new WeatherCard(this.#client, params);
             let element = await weatherCard.init()
-            element.className = 'col-6';
+            element.className = 'col-12';
             this.#element.querySelector('#temperatureCards').appendChild(element);
             this.#components.set('weatherCard',weatherCard);
           }
           else{
             let component = this.#components.get('weatherCard');
-            component.updateTemperature(params.value);
+            component.updateTemperature(params);
           }
-          break;
-        case 'ThermometerCard':
-          const thermometerCard = new ThermometerCard(this.#client, params);
-          thermometerCard.init().then((element) => {
-            this.#element.appendChild(element);
-          });
           break;
         default:
           console.error('Unknown component type:', componentType);

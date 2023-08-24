@@ -58,6 +58,13 @@ export function subscribeToServices(services) {
             activeServiceStored.workingTemperature = payload.workingTemperature;
             memoryService.updateWebsocketClients(service.id);
           }
+          else if (service.serviceType === memoryService.serviceTypes.THERMOMETER){
+            let activeServiceStored = memoryService.activeServices.find(el => el.id === service.id);
+            activeServiceStored.lastScanAt = payload.lastScanAt;
+            activeServiceStored.value = payload.value;
+            memoryService.getDatabaseConnection().store('homeTemperatures',{value: Number(payload.value)});
+            memoryService.updateWebsocketClients(service.id);
+          }
         }
       }
         catch (e) {

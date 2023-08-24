@@ -14,7 +14,7 @@ export function routes(app,wss,  config) {
     (jwt.verify(req.cookies.tokenLookout , config.jwtSecretKey) ? next() : res.sendStatus(401)) :
     res.sendStatus(401);
   const internalAuthentication =  (req, res, next) =>
-    req.params.token === 'ASKLJN739GSKHB098JKBHJBSADOIJLASBDIOPJAKJKBENaskmlasknflasmdnkln=2klasnddklnasd2klasmdmklasdjasdacapok2345435red'
+    req.query.token === 'ASKLJN739GSKHB098JKBHJBSADOIJLASBDIOPJAKJKBENaskmlasknflasmdnkln2klasnddklnasd2klasmdmklasdjasdacapok2345435red'
     ? next() : res.sendStatus(401);
 
   app.post('/api/login', (req, res) => {

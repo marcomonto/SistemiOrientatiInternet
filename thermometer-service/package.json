@@ -15,6 +15,7 @@
   "license": "MIT",
   "homepage": "https://github.com/SOI-Unipr/weather-service#readme",
   "dependencies": {
+    "axios": "^1.4.0",
     "body-parser": "^1.19.0",
     "commander": "^6.1.0",
     "compression": "^1.7.4",

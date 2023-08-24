@@ -1,7 +1,8 @@
 'use strict';
 
-import {DateTime} from 'luxon';
 import {EventEmitter} from 'events';
+import dotenv from "dotenv";
+import axios from "axios";
 
 class ValidationError extends Error {
   #message;
@@ -16,22 +17,13 @@ class ValidationError extends Error {
   }
 }
 
-const statusEnum = {
-  ON: 'on',
-  OFF: 'off',
-  ERROR: 'error'
-};
-/**
- * A WebSocket handler to deal with weather subscriptions.
- */
-export class ThermometerHandler extends EventEmitter {
+export class WebSocketHandler extends EventEmitter {
   #ws;
   #config;
   #name;
   #timeout;
   #buffer;
   #death;
-
 
   /**
    * Instances a new weather handler.
@@ -66,8 +58,12 @@ export class ThermometerHandler extends EventEmitter {
 
     // @formatter:off
     switch (json.type) {
-      case 'subscribe': this._onSubscribe(); break;
-      case 'unsubscribe': this._onUnsubscribe(); break;
+      case 'subscribe':
+        this._onSubscribe();
+        break;
+      case 'unsubscribe':
+        this._onUnsubscribe();
+        break;
     }
     // @formatter:on
   }
@@ -84,9 +80,8 @@ export class ThermometerHandler extends EventEmitter {
   start() {
     console.debug('New connection received', {handler: this.#name});
 
-    // simulate a client disconnection
     if (this.#config.failures && this.#config.timeToLive > 0) {
-      this._scheduleDeath();
+      //this._scheduleDeath();
     }
   }
 
@@ -123,30 +118,46 @@ export class ThermometerHandler extends EventEmitter {
    * @return {number} Milliseconds
    * @private
    */
+
+  /*
   _someMillis() {
     return anIntegerWithPrecision(this.#config.frequency, 0.2);
   }
+*/
 
   /**
    * Sends the temperature message.
    * @private
    */
-  _sendTemperature() {
-    //const value = temperatureAt(DateTime.now());
-    const msg = {type: 'temperature', dateTime: DateTime.now().toISO(), value};
+  async _sendData() {
+    try {
+      console.log(process.env.SERVER_ADDRESS)
+      let response = await axios.get(process.env.SERVER_ADDRESS,{
+        params: {
+          token: "ASKLJN739GSKHB098JKBHJBSADOIJLASBDIOPJAKJKBENaskmlasknflasmdnkln2klasnddklnasd2klasmdmklasdjasdacapok2345435red"
+        }
+      });
+      console.log(response.data)
+      return;
+      const msg = {
+        type: 'door', payload: {
+          dateTime: (new Date()).toISOString(),
+          status: memoryService.getStatus()
+        }
+      };
+      this.#buffer.push(msg);
 
-    // message is always appended to the buffer
-    this.#buffer.push(msg);
-
-    // messages are dispatched immediately if delays are disabled or a random number is
-    // generated greater than `delayProb` messages
-    if (!this.#config.delays || Math.random() > this.#config.delayProb) {
-      for (const bMsg of this.#buffer) {
-        this._send(bMsg);
+      if (!this.#config.delays || Math.random() > this.#config.delayProb) {
+        for (const bMsg of this.#buffer) {
+          this._send(bMsg);
+        }
+        this.#buffer = [];
+      } else {
+        console.info(`💤 Due to network delays, ${this.#buffer.length} messages are still queued`, {handler: this.#name});
       }
-      this.#buffer = [];
-    } else {
-      console.info(`💤 Due to network delays, ${this.#buffer.length} messages are still queued`, {handler: this.#name});
+    }
+    catch (e) {
+      console.log(e.message)
     }
   }
 
@@ -172,8 +183,8 @@ export class ThermometerHandler extends EventEmitter {
 
     console.debug('🌡  Subscribing to temperature', {handler: this.#name});
     const callback = () => {
-      this._sendTemperature();
-      this.#timeout = setTimeout(callback, this._someMillis());
+      this._sendData();
+      this.#timeout = setTimeout(callback, 5000);
     };
     this.#timeout = setTimeout(callback, 0);
   }

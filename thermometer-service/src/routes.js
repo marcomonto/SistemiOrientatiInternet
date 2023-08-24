@@ -1,6 +1,6 @@
 'use strict';
 
-import {ThermometerHandler} from './thermometer-handler.js';
+import {WebSocketHandler} from './webSocketHandler.js';
 import {v4 as uuid} from 'uuid';
 
 /**
@@ -63,10 +63,9 @@ function registerHandler(ws, handler) {
  * @param {{iface: string, port: number}} config Configuration options
  */
 export function routes(app, wss, config) {
-
   wss.on('connection', ws => {
     try {
-      const handler = new ThermometerHandler(ws, config, `weather:${uuid()}`);
+      const handler = new WebSocketHandler(ws, config, `weather:${uuid()}`);
       registerHandler(ws, handler);
     } catch (e) {
       console.error('💥 Failed to register WS handler, closing connection', e);

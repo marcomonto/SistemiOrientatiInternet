@@ -27,10 +27,27 @@
       this.#element.className = 'card';
       this.#element.id = 'weatherCard';
 
-      const graph = document.createElement('canvas');
-      graph.id = "weatherTemperatureChart";
-      this.renderChart(graph)
-      this.#element.appendChild(graph);
+
+      const containerGraph = document.createElement('div');
+      containerGraph.className = 'd-flex';
+      containerGraph.setAttribute("style",
+        "max-width:400px");
+
+      const graphWeather = document.createElement('canvas');
+      graphWeather.id = "weatherTemperatureChart";
+      graphWeather.setAttribute("style",
+        "height: 200px; width:50%");
+      this.renderChart(graphWeather, 'WEATHER')
+      containerGraph.appendChild(graphWeather);
+
+      const graphHome = document.createElement('canvas');
+      graphHome.id = "weatherTemperatureChart";
+      graphHome.setAttribute("style",
+        "height: 200px; width:50%");
+      this.renderChart(graphHome, 'HOME')
+      containerGraph.appendChild(graphHome);
+
+      this.#element.appendChild(containerGraph);
 
       const title = document.createElement('h3');
       title.textContent = 'Temperature Information';
@@ -49,26 +66,20 @@
       return this.#element;
     }
 
-    renderChart(canvas) {
-      //const canvas = document.getElementById('weatherTemperatureChart');
-      console.log(canvas);
-      canvas.height = 75;
-
-      const labels = [
-        'dju32',
-        'ad6b2',
-        '0f23f',
-        'asd4c',
-      ];
+    renderChart(canvas, type) {
+      const labels = [];
 
       const data = {
         labels: labels,
-        datasets: [{
-          label: 'Test',
-          backgroundColor: 'rgb(255, 99, 132)',
-          borderColor: 'rgb(255, 99, 132)',
-          data: [0, 10, 5, 4],
-        }]
+        datasets: [
+          {
+            id: 'WEATHER',
+            label: type === 'WEATHER' ? 'Weather Temperature' : 'Home Temperature',
+            backgroundColor: 'rgb(255, 99, 132)',
+            borderColor: 'rgb(255, 99, 132)',
+            data: [],
+          },
+        ]
       };
 
       const config = {
@@ -81,22 +92,31 @@
         canvas,
         config
       );
+      const startTime = Date.now();
       setInterval(() => {
-        const newLabel = (Math.random() + 1).toString(36).substring(7);
-        const newData = Math.floor(Math.random() * (10 - 1 + 1)) + 1;
-        this.addData(myChart, newLabel, newData);
-      }, 1000);
+        let currentTime = Date.now() - startTime;
+        let value = Math.random() * 100; // Generate a random value for demonstration
+        this.addData(myChart, currentTime, value);
+      }, 3000); // Update every 1 second
     }
 
     addData(chart, label, data) {
+      if(chart.data.labels.length === 10){
+        chart.data.labels.shift();
+        chart.data.datasets.forEach((dataset) => {
+          dataset.data.shift();
+        });
+      }
       chart.data.labels.push(label);
       chart.data.datasets.forEach((dataset) => {
         dataset.data.push(data);
       });
+      console.log(chart.data.labels, chart.data.datasets[0])
       chart.update();
     }
 
     updateTemperature(newTemperature) {
+      return;
       this.#currentTemperature = newTemperature
       const temperatureValue = this.#element.querySelector('.temperature-value');
       temperatureValue.textContent = this.#currentTemperature.toFixed(2);
