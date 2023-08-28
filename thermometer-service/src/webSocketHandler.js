@@ -107,12 +107,9 @@ export class WebSocketHandler extends EventEmitter {
       let response = await axios.get(process.env.SERVER_ADDRESS);
       let temperatureCalculator = new Temperature(response.data.payload);
       let payloadTemperature = temperatureCalculator.calcTemperature();
-
       if(!payloadTemperature.success)
         return
-
       this.#buffer.push(payloadTemperature);
-
       if (!this.#config.delays || Math.random() > this.#config.delayProb) {
         for (const bMsg of this.#buffer) {
           this._send(bMsg);

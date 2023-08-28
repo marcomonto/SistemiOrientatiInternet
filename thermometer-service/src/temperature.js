@@ -1,3 +1,4 @@
+
 export default class Temperature {
 
   windows;
@@ -32,28 +33,37 @@ export default class Temperature {
       if (!this.outsideTemperature)
         return
       if (this.insideTemperature != null) {
-        this.insideTemperature *=
+
+        let differenceTemperature = (this.outsideTemperature - this.insideTemperature) * 0.4;
+
+        if(differenceTemperature < 0.5)
+          differenceTemperature = 0.5;
+
+        let variationPercentage =
           (
-            this.insideTemperature < this.outsideTemperature ? 0.1 : -0.1
-            + (this.insideTemperature < this.outsideTemperature ?
-                this.windows.filter(el => el.status === this.statusEnum.ON).length * 0.1 :
-                this.windows.filter(el => el.status === this.statusEnum.ON).length * -0.1)
-            + (this.insideTemperature < this.outsideTemperature ?
-                this.doors.filter(el => el.status === this.statusEnum.ON).length * 0.2 :
-                this.doors.filter(el => el.status === this.statusEnum.ON).length * -0.2)
+            (this.insideTemperature < this.outsideTemperature ? 0.1 : -0.1)
+            +
+            (
+              this.insideTemperature < this.outsideTemperature ?
+              this.windows.filter(el => el.status === this.statusEnum.ON).length * 0.1 :
+              this.windows.filter(el => el.status === this.statusEnum.ON).length * -0.1
+            )
+            +
+            (
+              this.insideTemperature < this.outsideTemperature ?
+              this.doors.filter(el => el.status === this.statusEnum.ON).length * 0.2 :
+              this.doors.filter(el => el.status === this.statusEnum.ON).length * -0.2
+            )
           )
-        if (this.heatPump?.status === this.statusEnum.ON && this.heatPump.value > this.insideTemperature) {
+        this.insideTemperature += (Math.abs(differenceTemperature) * variationPercentage);
+        /*if (this.heatPump?.status === this.statusEnum.ON && this.heatPump.value > this.insideTemperature) {
           this.insideTemperature += (this.heatPump.value - this.insideTemperature) * 0.3
-        }
+        }*/
       } else {
         this.insideTemperature = this.outsideTemperature + 2; // base case
       }
-      console.log({
-        success: true,
-        value: this.insideTemperature,
-        lastScanAt: new Date().toISOString()
-      })
       return {
+        success: true,
         type: 'thermometer',
         payload: {
           value: this.insideTemperature,
@@ -61,6 +71,7 @@ export default class Temperature {
         }
       }
     } catch (e) {
+      console.log(e)
       return {
         success: false
       }
