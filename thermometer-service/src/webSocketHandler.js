@@ -1,8 +1,8 @@
 'use strict';
 
 import {EventEmitter} from 'events';
-import dotenv from "dotenv";
 import axios from "axios";
+import Temperature from "./temperature.js";
 
 class ValidationError extends Error {
   #message;
@@ -55,8 +55,6 @@ export class WebSocketHandler extends EventEmitter {
       this._send({error: e.message});
       return;
     }
-
-    // @formatter:off
     switch (json.type) {
       case 'subscribe':
         this._onSubscribe();
@@ -65,7 +63,6 @@ export class WebSocketHandler extends EventEmitter {
         this._onUnsubscribe();
         break;
     }
-    // @formatter:on
   }
 
   stop() {
@@ -76,7 +73,6 @@ export class WebSocketHandler extends EventEmitter {
       clearTimeout(this.#death);
     }
   }
-
   start() {
     console.debug('New connection received', {handler: this.#name});
 
@@ -84,7 +80,6 @@ export class WebSocketHandler extends EventEmitter {
       //this._scheduleDeath();
     }
   }
-
   _scheduleDeath() {
     const secs = (Math.random() * this.#config.timeToLive + 5).toFixed(0);
     console.info(`💣 Be ready for the fireworks in ${secs} seconds...`, {handler: this.#name});
@@ -96,12 +91,6 @@ export class WebSocketHandler extends EventEmitter {
     }, secs * 1000);
   }
 
-  /**
-   * Validates an incoming message.
-   * @param msg {string} Any message string that can be parsed as JSON
-   * @return {any} An object representing the incoming message
-   * @private
-   */
   _validateMessage(msg) {
     if (!msg) {
       throw new ValidationError('Invalid inbound message');
@@ -113,39 +102,16 @@ export class WebSocketHandler extends EventEmitter {
     return json;
   }
 
-  /**
-   * Generates a random delay in milliseconds.
-   * @return {number} Milliseconds
-   * @private
-   */
-
-  /*
-  _someMillis() {
-    return anIntegerWithPrecision(this.#config.frequency, 0.2);
-  }
-*/
-
-  /**
-   * Sends the temperature message.
-   * @private
-   */
   async _sendData() {
     try {
-      console.log(process.env.SERVER_ADDRESS)
-      let response = await axios.get(process.env.SERVER_ADDRESS,{
-        params: {
-          token: "ASKLJN739GSKHB098JKBHJBSADOIJLASBDIOPJAKJKBENaskmlasknflasmdnkln2klasnddklnasd2klasmdmklasdjasdacapok2345435red"
-        }
-      });
-      console.log(response.data)
-      return;
-      const msg = {
-        type: 'door', payload: {
-          dateTime: (new Date()).toISOString(),
-          status: memoryService.getStatus()
-        }
-      };
-      this.#buffer.push(msg);
+      let response = await axios.get(process.env.SERVER_ADDRESS);
+      let temperatureCalculator = new Temperature(response.data.payload);
+      let payloadTemperature = temperatureCalculator.calcTemperature();
+
+      if(!payloadTemperature.success)
+        return
+
+      this.#buffer.push(payloadTemperature);
 
       if (!this.#config.delays || Math.random() > this.#config.delayProb) {
         for (const bMsg of this.#buffer) {

@@ -67,7 +67,7 @@ export function routes(app,wss,  config) {
     }
   });
 
-  app.get('/api/sensors', internalAuthentication ,(req, res) => {
+  app.get('/api/sensors' ,(req, res) => {
     try {
       return res.json({
         success: true,

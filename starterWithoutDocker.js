@@ -7,6 +7,7 @@ const directories = [
   "weather-service-master",
   "window-service",
   "heatPump-service",
+  //"thermometer-service",
   "backend/todo-server",
   "frontend/todo-app",
 ];
