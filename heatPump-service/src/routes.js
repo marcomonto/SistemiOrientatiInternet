@@ -78,14 +78,14 @@ export function routes(app, wss, config) {
   app.put('/api/status',async (req, res) => {
     try{
       memoryService.setStatus(req.body.newStatus);
-      return {
+      res.json({
         success: true
-      };
+      })
     }
     catch (e){
-      return {
+      res.json({
         success: false
-      }
+      })
     }
   });
 }

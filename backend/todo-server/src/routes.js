@@ -2,6 +2,8 @@
 import jwt from 'jsonwebtoken';
 import {WebsocketHandler} from "./websocketHandler.js";
 import memoryService from "./memoryService.js";
+import {auth} from "google-auth-library";
+import axios from "axios";
 
 /**
  * Initializes routes.
@@ -79,17 +81,23 @@ export function routes(app,wss,  config) {
   });
 
   app.put('/api/sensor/:id', authenticated, async (req, res) => {
-    let serviceToCall = memoryService.connections.find(el => el.index == req.params.id);
-    const payload = req.body;
-    if(!serviceToCall)
-      return res.sendStatus(403);
-    const address = serviceToCall.address
-    let responseFromService = await axios.post(address,{
-      newStatus: payload.newStatus
-    });
-    return {
-      success: true
-    };
+    try{
+      const payload = req.body;
+      let responseFromService = axios.post(
+        process.env.ACTUATOR_ADDRESS + '/api/sensor/' + req.params.id,{
+        newStatus: payload.newStatus
+      });
+      return res.json({
+        success: true,
+        message: 'COMMAND_SENT'
+      })
+    }
+    catch (e) {
+      console.log(e.message)
+      res.json({
+        success: false
+      })
+    }
   });
 
   wss.on('connection', (ws, req) => {

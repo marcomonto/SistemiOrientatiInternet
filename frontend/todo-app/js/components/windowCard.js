@@ -27,7 +27,6 @@
       this.#status = params.status;
       this.#serviceId = params.id;
       this.#lastScanAt = params.lastScanAt;
-      this.registerRenderComponents()
     }
 
     /**
@@ -82,8 +81,11 @@
       const openedLabel = document.createElement('a');
       openedLabel.id = 'buttonCard_' + this.#serviceId;
       openedLabel.className = 'btn btn-primary';
-      openedLabel.textContent = (this.#status === 'off' || this.#status === 'error') ? 'Open' : 'close';
+      openedLabel.textContent = (this.#status === 'off' || this.#status === 'error') ? 'Open' : 'Close';
       this.#element.appendChild(openedLabel);
+
+      let hdlr = new Handler('click', openedLabel, () => this.buttonStatusClicked());
+      this.#handlers.push(hdlr);
 
       return this.#element;
     }
@@ -113,7 +115,7 @@
     }
     registerRenderComponents() {
       const { BehaviorSubject } = rxjs;
-      const statusObserver = new BehaviorSubject(this.#status); //initialValue
+      const statusObserver = new BehaviorSubject({status: this.#status, lastScanAt: this.#lastScanAt}); //initialValue
       const statusSubscription = statusObserver.subscribe(payload => {
         if(payload.status !== this.#status){
           let elementToUpdate = document.querySelector('#card_' + this.#serviceId);

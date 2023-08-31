@@ -8,6 +8,7 @@ const directories = [
   "window-service",
   "heatPump-service",
   "thermometer-service",
+  "actuator-service",
   "backend/todo-server",
   "frontend/todo-app",
 ];

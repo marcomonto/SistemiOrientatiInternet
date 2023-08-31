@@ -43,7 +43,6 @@
     async test() {
       try {
         let response = await this.#client.get('updateInfo')
-        console.log(response)
       } catch (err) {
         console.log(err)
       }
@@ -59,7 +58,6 @@
         }));
       };
       socket.onmessage =  (event) => {
-        console.log('Received message:', event.data);
         try {
           let message = JSON.parse(event.data);
           let serviceType = message.payload.serviceType;
@@ -98,11 +96,12 @@
       switch (componentType) {
         case 'WindowCard':
           if(!this.#components.get('windowCard')){
-            const weatherCard = new WindowCard(this.#client, params);
-            let element = await weatherCard.init();
+            const windowCard = new WindowCard(this.#client, params);
+            let element = await windowCard.init();
             element.className = 'col-4';
             this.#element.querySelector('#sensorCards').appendChild(element);
-            this.#components.set('windowCard',weatherCard);
+            windowCard.registerRenderComponents(); // init reactivity
+            this.#components.set('windowCard',windowCard);
           }
           else{
             let component = this.#components.get('windowCard');
@@ -115,6 +114,7 @@
             let element = await doorCard.init();
             element.className = 'col-4';
             this.#element.querySelector('#sensorCards').appendChild(element);
+            doorCard.registerRenderComponents(); // init reactivity
             this.#components.set('doorCard',doorCard);
           }
           else{
@@ -128,6 +128,7 @@
             let element = await heatPumpCard.init()
             element.className = 'col-4';
             this.#element.querySelector('#sensorCards').appendChild(element);
+            heatPumpCard.registerRenderComponents(); // init reactivity
             this.#components.set('heatPumpCard',heatPumpCard);
           }
           else{
@@ -142,11 +143,12 @@
             let element = await weatherCard.init()
             element.className = 'col-12';
             this.#element.querySelector('#temperatureCards').appendChild(element);
+            //TODO weatherCard.registerRenderComponents(); // init reactivity
             this.#components.set('weatherCard',weatherCard);
           }
           else{
             let component = this.#components.get('weatherCard');
-            component.updateTemperature(params);
+            component.update(params);
           }
           break;
         default:

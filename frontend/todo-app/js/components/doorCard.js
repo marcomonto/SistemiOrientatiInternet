@@ -31,7 +31,6 @@
       this.#status = params.status;
       this.#serviceId = params.id;
       this.#lastScanAt = params.lastScanAt;
-      this.registerRenderComponents()
     }
     /**
      * Destroys this component, removing it from it's parent node.
@@ -96,6 +95,9 @@
       openedLabel.textContent = (this.#status === 'off' || this.#status === 'error') ? 'Open' : 'Close Door';
       this.#element.appendChild(openedLabel);
 
+      let hdlr = new Handler('click', openedLabel, () => this.buttonStatusClicked());
+      this.#handlers.push(hdlr);
+
       return this.#element;
     }
     async buttonStatusClicked() {
@@ -122,7 +124,7 @@
     }
     registerRenderComponents() {
       const { BehaviorSubject } = rxjs;
-      const statusObserver = new BehaviorSubject(this.#status); //initialValue
+      const statusObserver = new BehaviorSubject({status: this.#status, lastScanAt: this.#lastScanAt}); //initialValue
       const statusSubscription = statusObserver.subscribe(payload => {
         if(payload.status !== this.#status){
           let elementToUpdate = document.querySelector('#card_' + this.#serviceId);
