@@ -97,7 +97,7 @@ async function run() {
     fallbacks(app);
 
     //Connecting to database....
-    const database = new DatabaseHandler('http://localhost:8085','prova@mail.com', 'provaprova');
+    const database = new DatabaseHandler(process.env.POCKETBASE_ADDRESS,'prova@mail.com', 'provaprova');
     await database.connect();
     memoryService.setDatabaseConnection(database);
 

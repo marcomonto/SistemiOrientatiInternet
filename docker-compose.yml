@@ -7,8 +7,36 @@ services:
       - 8080:80
     networks:
       todo-app-network:
-        ipv4_address: "10.88.0.21"
-      
+        ipv4_address: 10.88.0.21
+  #Database
+  pocketbase:
+    build: ./pocketbase
+    ports:
+      - 8085:8085
+    networks:
+      todo-app-network:
+        ipv4_address: 10.88.0.22
+  actuatorService:
+    build: ./actuator-service
+    ports:
+      - 8006:8006
+    networks:
+      todo-app-network:
+        ipv4_address: 10.88.0.23
+  doorService:
+    build: ./door-service
+    ports:
+      - 8003:8003
+    networks:
+      todo-app-network:
+        ipv4_address: 10.88.0.24
+  heatPumpService:
+    build: ./heatPump-service
+    ports:
+      - 8004:8004
+    networks:
+      todo-app-network:
+        ipv4_address: 10.88.0.25
   # Backend
   todo-server:
     build: ./backend
@@ -17,7 +45,7 @@ services:
     networks:
       todo-app-network:
         #bind to apache proxy pass
-        ipv4_address: "10.88.0.11"
+        ipv4_address: 10.88.0.11
 
 networks:
   todo-app-network:    
@@ -25,4 +53,4 @@ networks:
       driver: bridge
       ipam:
         config:
-          - subnet: "10.88.0.0/16"
+          - subnet: "10.88.0.0/24"

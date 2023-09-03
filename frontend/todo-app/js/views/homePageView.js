@@ -143,7 +143,7 @@
             let element = await weatherCard.init()
             element.className = 'col-12';
             this.#element.querySelector('#temperatureCards').appendChild(element);
-            //TODO weatherCard.registerRenderComponents(); // init reactivity
+            weatherCard.registerRenderComponents(); // init reactivity
             this.#components.set('weatherCard',weatherCard);
           }
           else{
