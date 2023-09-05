@@ -77,6 +77,14 @@ class MemoryService {
     this.#databaseConnection = value;
   }
 
+  async setServicesFromDatabase(){
+    const response = await this.#databaseConnection.get('availableServices');
+    this.connections = response.payload.map(el => ({
+      address: el.address,
+      id: el.id,
+      serviceType: el.type
+    }));
+  }
 }
 
 export default new MemoryService()

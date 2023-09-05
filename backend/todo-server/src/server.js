@@ -100,6 +100,9 @@ async function run() {
     const database = new DatabaseHandler(process.env.POCKETBASE_ADDRESS,'prova@mail.com', 'provaprova');
     await database.connect();
     memoryService.setDatabaseConnection(database);
+    if(!!process.env.IS_DOCKER_INSTANCE){
+        await memoryService.setServicesFromDatabase();
+    }
 
     //Subscribing to microservices...
     subscribeToServices(memoryService.connections)

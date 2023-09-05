@@ -83,7 +83,6 @@ export function routes(app, wss, config) {
       if(!serviceToCall)
         return;
       const address = serviceToCall.address
-      console.log(serviceToCall, "http://" + address.replace("ws://", "") +'/api/status')
       let responseFromService = await axios.put("http://" + address.replace("ws://", "") +'/api/status' ,{
         newStatus: payload.newStatus
       });

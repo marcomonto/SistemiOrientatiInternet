@@ -78,6 +78,7 @@ export function subscribeToServices(services) {
       //setTimeout(() => subscribeToServices([{...service}]), 5000);
     });
     ws.on('error', (error) => {
+      console.log(error, error.code)
       if (error.code === 'ECONNREFUSED') {
         if(!service.tries || service.tries < 3){
           console.log('I will retry to connect in 30s...')

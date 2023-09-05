@@ -30,7 +30,10 @@ export default class DatabaseHandler {
     try {
       if (!filters) {
         let response = await this.#pb.collection(collection).getFullList();
-        console.log(response)
+        return {
+          success: true,
+          payload: response
+        }
       }
     } catch (e) {
       console.log(e)

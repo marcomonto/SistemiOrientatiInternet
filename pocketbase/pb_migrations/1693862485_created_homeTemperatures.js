@@ -1,15 +1,16 @@
+/// <reference path="../pb_data/types.d.ts" />
 migrate((db) => {
   const collection = new Collection({
-    "id": "tj0rjs6ghxq23li",
-    "created": "2023-08-14 14:17:26.066Z",
-    "updated": "2023-08-14 14:17:26.066Z",
-    "name": "weatherTemperatures",
+    "id": "opixjyat1csax0k",
+    "created": "2023-09-04 21:21:25.696Z",
+    "updated": "2023-09-04 21:21:25.696Z",
+    "name": "homeTemperatures",
     "type": "base",
     "system": false,
     "schema": [
       {
         "system": false,
-        "id": "to5stlc0",
+        "id": "oyn9sss0",
         "name": "value",
         "type": "number",
         "required": false,
@@ -32,7 +33,7 @@ migrate((db) => {
   return Dao(db).saveCollection(collection);
 }, (db) => {
   const dao = new Dao(db);
-  const collection = dao.findCollectionByNameOrId("tj0rjs6ghxq23li");
+  const collection = dao.findCollectionByNameOrId("opixjyat1csax0k");
 
   return dao.deleteCollection(collection);
 })

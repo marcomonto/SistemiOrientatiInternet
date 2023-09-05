@@ -24,7 +24,6 @@
     let elem, /** @type {{init:()=>Promise<HTMLElement>,destroy:()=>void}} */ comp;
     try {
       let response = await client.get('user/details', {})
-      console.log(response)
       if (!!response)
         await loadHomePage();
     } catch (e) {
