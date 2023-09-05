@@ -49,7 +49,7 @@
     }
 
     connectWebSocket() {
-      const socket = new WebSocket('ws://localhost:8000'); // Replace with your WebSocket server URL
+      const socket = new WebSocket('ws://'+ window.location.hostname +':8000'); // Replace with your WebSocket server URL
       // WebSocket event handlers
       socket.onopen = () => {
         // Send a message to the WebSocket server
