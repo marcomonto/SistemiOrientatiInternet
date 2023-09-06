@@ -15,9 +15,6 @@ export function routes(app,wss,  config) {
   const authenticated = (req, res, next) => req.cookies?.tokenLookout ?
     (jwt.verify(req.cookies.tokenLookout , config.jwtSecretKey) ? next() : res.sendStatus(401)) :
     res.sendStatus(401);
-  const internalAuthentication =  (req, res, next) =>
-    req.query.token === 'ASKLJN739GSKHB098JKBHJBSADOIJLASBDIOPJAKJKBENaskmlasknflasmdnkln2klasnddklnasd2klasmdmklasdjasdacapok2345435red'
-    ? next() : res.sendStatus(401);
 
   app.post('/api/login', (req, res) => {
     const {username, password} = req.body;
@@ -37,7 +34,7 @@ export function routes(app,wss,  config) {
         .cookie("tokenLookout", token, {
           httpOnly: true,
           //secure: true,
-          maxAge: 100000
+          maxAge: 365 * 24 * 60 * 60 * 1000
         }).json({
           success: true,
           payload: 'ciao'

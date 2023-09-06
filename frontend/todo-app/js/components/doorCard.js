@@ -48,7 +48,7 @@
       this.#element.className = 'card';
       this.#element.id = 'card_' + this.#serviceId;
       this.#element.setAttribute("style",
-        (this.#status === 'CLOSED' || this.#status === 'ERROR') ?
+        (this.#status === 'off' || this.#status === 'error') ?
           "border-radius: 25px; border: 2px solid yellow;" :
           "border-radius: 25px; border: 2px solid #73AD21;");
 
@@ -66,7 +66,7 @@
 
       const icon = document.createElement('i');
       icon.id = "iconCard_" + this.#serviceId;
-      icon.className = (this.#status === 'CLOSED' || this.#status === 'ERROR') ? "bi bi-door-closed" : 'bi bi-door-open';
+      icon.className = (this.#status === 'off' || this.#status === 'error') ? "bi bi-door-closed" : 'bi bi-door-open';
       icon.setAttribute("style", "margin-right: 5px;");
       title.appendChild(icon);
 

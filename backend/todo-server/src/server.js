@@ -33,7 +33,7 @@ function init(app) {
     app.use(bodyParser.urlencoded({ extended: true }));
     app.use(cookieParser());
     app.use(cors({
-        origin: ['http://localhost:80','http://montorsi.soi2223.unipr.it:8080'],
+        origin: ['http://localhost:8080','http://montorsi.soi2223.unipr.it:8080'],
         credentials: true
     }));
 /*    app.use(function(req, res, next) {

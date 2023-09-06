@@ -98,7 +98,8 @@
           if(!this.#components.get('windowCard')){
             const windowCard = new WindowCard(this.#client, params);
             let element = await windowCard.init();
-            element.className = 'col-4';
+            element.className = 'col-6';
+            element.setAttribute("style",'height: 150px');
             this.#element.querySelector('#sensorCards').appendChild(element);
             windowCard.registerRenderComponents(); // init reactivity
             this.#components.set('windowCard',windowCard);
@@ -112,7 +113,8 @@
           if(!this.#components.get('doorCard')){
             const doorCard = new DoorCard(this.#client, params);
             let element = await doorCard.init();
-            element.className = 'col-4';
+            element.className = 'col-6';
+            element.setAttribute("style",'height: 150px');
             this.#element.querySelector('#sensorCards').appendChild(element);
             doorCard.registerRenderComponents(); // init reactivity
             this.#components.set('doorCard',doorCard);
@@ -126,7 +128,8 @@
           if(!this.#components.get('heatPumpCard')){
             const heatPumpCard = new HeatPumpCard(this.#client, params);
             let element = await heatPumpCard.init()
-            element.className = 'col-4';
+            element.className = 'col-6';
+            element.setAttribute("style",'height: 150px');
             this.#element.querySelector('#sensorCards').appendChild(element);
             heatPumpCard.registerRenderComponents(); // init reactivity
             this.#components.set('heatPumpCard',heatPumpCard);

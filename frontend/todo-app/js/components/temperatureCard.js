@@ -5,7 +5,7 @@
     /** @type {number} */
     #homeTemperature;
     /** @type {number} */
-    #weatherTemperature;
+    #weatherTemperature = 20;
     /** @type {Handler[]} */
     #handlers = [];
     #client;
@@ -45,15 +45,25 @@
       const graphWeather = document.createElement('canvas');
       graphWeather.id = "weatherTemperatureChart";
       graphWeather.setAttribute("style",
-        "height: 200px; width:50%");
+        "height: 300px; width:50%");
       this.renderChart(graphWeather, 'WEATHER')
       containerColumnOne.appendChild(graphWeather);
 
+      const labelContainer = document.createElement('div');
+      labelContainer.className = 'd-flex justify-content-center'
+
       const weatherTemperatureValue = document.createElement('span');
-      weatherTemperatureValue.textContent = this.#homeTemperature.toString();
+      weatherTemperatureValue.textContent = this.#weatherTemperature.toString() + ' °C';
       weatherTemperatureValue.className = 'temperature';
       weatherTemperatureValue.id = 'weatherTemperatureLabel';
-      containerColumnOne.appendChild(weatherTemperatureValue);
+      labelContainer.appendChild(weatherTemperatureValue);
+
+      const iconWeather = document.createElement('i');
+      iconWeather.className = "fas fa-solid fa-sun";
+      iconWeather.setAttribute('color', '#dfca43');
+      labelContainer.appendChild(iconWeather);
+
+      containerColumnOne.appendChild(labelContainer);
 
       containerGraph.appendChild(containerColumnOne);
       //------------------------------ SECOND COLUMN ----------------------------------
@@ -63,15 +73,25 @@
       const graphTemperature = document.createElement('canvas');
       graphTemperature.id = "insideTemperatureChart";
       graphTemperature.setAttribute("style",
-        "height: 200px; width:50%");
+        "height: 300px; width:50%");
       this.renderChart(graphTemperature, 'HOME')
       containerColumnTwo.appendChild(graphTemperature);
 
+      const labelContainer2 = document.createElement('div');
+      labelContainer2.className = 'd-flex justify-content-center'
+
       const temperatureValue = document.createElement('span');
-      temperatureValue.textContent = this.#homeTemperature.toString();
+      temperatureValue.textContent = this.#homeTemperature.toString() + ' °C';
       temperatureValue.className = 'temperature';
-      weatherTemperatureValue.id = 'homeTemperatureLabel';
-      containerColumnTwo.appendChild(temperatureValue);
+      temperatureValue.id = 'homeTemperatureLabel';
+      labelContainer2.appendChild(temperatureValue);
+
+      const iconHome = document.createElement('i');
+      iconWeather.className = "fa-regular fa-sun";
+      iconWeather.setAttribute('color', '#dfca43');
+      labelContainer2.appendChild(iconHome);
+
+      containerColumnTwo.appendChild(labelContainer2);
 
       containerGraph.appendChild(containerColumnTwo);
 
@@ -128,11 +148,11 @@
       let observerObj = {};
       if(payload.serviceType === 'thermometer'){
         this.addData(this.#temperatureChart, payload.lastScanAt.substring(11,19), Number(payload.value.toFixed(2)))
-        observerObj.homeTemperature = payload.value;
+        observerObj.homeTemperature = Number(payload.value.toFixed(2));
       }
       else if(payload.serviceType === 'weather'){
         this.addData(this.#weatherChart,payload.lastScanAt.substring(11,19), Number(payload.value.toFixed(2)))
-        observerObj.weatherTemperature = payload.weatherTemperature;
+        observerObj.weatherTemperature = Number(payload.value.toFixed(2));
       }
       else return
       this.#statusObserver.next(observerObj);
@@ -141,15 +161,15 @@
       const { BehaviorSubject } = rxjs;
       const statusObserver = new BehaviorSubject({homeTemperature: this.#homeTemperature, weatherTemperature: this.#weatherTemperature}); //initialValue
       const statusSubscription = statusObserver.subscribe(payload => {
-        if(!!payload.homeTemperature && payload.homeTemperature !== this.#homeTemperature){
-          let elementToUpdate = document.querySelector('#homeTemperatureLabel');
-          elementToUpdate.textContent = payload.homeTemperature.toFixed(2);
-          this.#homeTemperature = payload.homeTemperature;
-        }
         if(!!payload.weatherTemperature && payload.weatherTemperature !== this.#weatherTemperature){
           let elementToUpdate = document.querySelector('#weatherTemperatureLabel');
-          elementToUpdate.textContent = payload.weatherTemperature.toFixed(2);
+          elementToUpdate.textContent = payload.weatherTemperature + ' °C';
           this.#weatherTemperature = payload.weatherTemperature;
+        }
+        if(!!payload.homeTemperature && payload.homeTemperature !== this.#homeTemperature){
+          let elementToUpdate = document.querySelector('#homeTemperatureLabel');
+          elementToUpdate.textContent = payload.homeTemperature + ' °C';
+          this.#homeTemperature = payload.homeTemperature;
         }
       });
       this.#rxjsSubscriptions.push(statusSubscription)
