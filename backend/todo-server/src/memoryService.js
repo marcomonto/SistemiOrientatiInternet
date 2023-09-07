@@ -50,6 +50,7 @@ class MemoryService {
             value: service.value, // it will be undefined if not weatherService
             lastScanAt: service.lastScanAt,
             status: service.status, // it will be undefined if it is weatherService
+            workingTemperature: service.workingTemperature, // it will be undefined if it isn't heatPumpService
             id: service.id
           }
         }

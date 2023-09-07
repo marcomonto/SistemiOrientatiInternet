@@ -85,14 +85,33 @@
         "padding-bottom: 5px;");
       this.#element.appendChild(cardBody);
 
+      const inputDiv = document.createElement('div');
+      inputDiv.className = 'd-flex align-items-center justify-content-between';
+
       const openedLabel = document.createElement('a');
       openedLabel.id = 'buttonCard_' + this.#serviceId;
       openedLabel.className = 'btn btn-primary';
       openedLabel.textContent = (this.#status === 'off' || this.#status === 'error') ? 'Open' : 'Close';
-      this.#element.appendChild(openedLabel);
+      inputDiv.appendChild(openedLabel);
+
+      const selectElement = document.createElement('select');
+      selectElement.id = 'temperatureSelector';
+
+      for (let temperature = 30; temperature <= 50; temperature += 5) {
+        const option = document.createElement('option');
+        option.value = temperature;
+        option.text = `${temperature}°C`;
+        selectElement.appendChild(option);
+      }
+
+      inputDiv.appendChild(selectElement);
 
       let hdlr = new Handler('click', openedLabel, () => this.buttonStatusClicked());
-      this.#handlers.push(hdlr);
+      let hdlr2 = new Handler('change', selectElement, () => this.temperatureChanged());
+      this.#handlers.push(hdlr,hdlr2);
+      console.log(this.#handlers);
+
+      this.#element.appendChild(inputDiv);
 
       return this.#element;
     }
@@ -107,7 +126,7 @@
         this.#waitingForResponse = false;
       }
       catch (e) {
-        console.log(e)
+        console.log(e.message)
         this.#waitingForResponse = false;
       }
     }
@@ -147,6 +166,10 @@
       });
       this.#rxjsSubscriptions.push(statusSubscription)
       this.#statusObserver = statusObserver;
+    }
+
+    temperatureChanged(){
+      console.log('ciaor')
     }
 
   }
