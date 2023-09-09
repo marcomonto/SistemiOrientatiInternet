@@ -56,19 +56,19 @@ export default class Temperature {
             )
           )
         this.insideTemperature += (Math.abs(differenceTemperature) * variationPercentage);
-        /*if (this.heatPump?.status === this.statusEnum.ON) {TODO error in logic to rivisit
-          this.insideTemperature += this.heatPump.workingTemperature * (() => {
-            if(this.heatPump.workingTemperature < this.insideTemperature + 7.5 )
-              return 0
-            else if(this.heatPump.workingTemperature < this.insideTemperature + 5)
-              return 0.02;
-            else if(this.heatPump.workingTemperature < this.insideTemperature + 2.5)
-                return 0.04;
-            else if(this.heatPump.workingTemperature < this.insideTemperature)
-              return 0.05;
-            else return 0;
-          })()
-        }*/
+        if (this.heatPump?.status === this.statusEnum.ON) {
+          const difference = this.heatPump.workingTemperature - this.insideTemperature;
+          if(difference >= 10 && difference < 12.5)
+            this.insideTemperature += this.heatPump.workingTemperature * 0.02;
+          else if(difference >= 12.5 && difference < 15)
+            this.insideTemperature += this.heatPump.workingTemperature * 0.03;
+          else if(difference >= 15 && difference < 17.5)
+            this.insideTemperature += this.heatPump.workingTemperature * 0.04;
+          else if(difference >= 17.5 && difference < 20)
+            this.insideTemperature += this.heatPump.workingTemperature * 0.05;
+          else
+            this.insideTemperature += 0;
+        }
       } else {
         this.insideTemperature = this.outsideTemperature + 2; // base case
       }

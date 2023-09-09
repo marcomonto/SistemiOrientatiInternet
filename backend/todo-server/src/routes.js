@@ -82,7 +82,8 @@ export function routes(app,wss,  config) {
       const payload = req.body;
       let responseFromService = axios.post(
         process.env.ACTUATOR_ADDRESS + '/api/sensor/' + req.params.id,{
-        newStatus: payload.newStatus
+          newStatus: payload.newStatus,
+          workingTemperature: payload.workingTemperature
       });
       return res.json({
         success: true,

@@ -21,6 +21,8 @@
     #rxjsSubscriptions = [];
     #statusObserver;
     #waitingForResponse = false;
+    #buttonLoader;
+    #buttonLoaderTimeOut;
 
     constructor(client, params) {
       super();
@@ -88,11 +90,11 @@
       const inputDiv = document.createElement('div');
       inputDiv.className = 'd-flex align-items-center justify-content-between';
 
-      const openedLabel = document.createElement('a');
-      openedLabel.id = 'buttonCard_' + this.#serviceId;
-      openedLabel.className = 'btn btn-primary';
-      openedLabel.textContent = (this.#status === 'off' || this.#status === 'error') ? 'Open' : 'Close';
-      inputDiv.appendChild(openedLabel);
+      const button = document.createElement('a');
+      button.id = 'buttonCard_' + this.#serviceId;
+      button.className = 'btn btn-primary';
+      button.textContent = (this.#status === 'off' || this.#status === 'error') ? 'Open' : 'Close';
+      inputDiv.appendChild(button);
 
       const selectElement = document.createElement('select');
       selectElement.id = 'temperatureSelector';
@@ -106,7 +108,7 @@
 
       inputDiv.appendChild(selectElement);
 
-      let hdlr = new Handler('click', openedLabel, () => this.buttonStatusClicked());
+      let hdlr = new Handler('click', button, () => this.buttonStatusClicked());
       let hdlr2 = new Handler('change', selectElement, () => this.temperatureChanged());
       this.#handlers.push(hdlr,hdlr2);
       console.log(this.#handlers);
@@ -120,14 +122,32 @@
         if(this.#waitingForResponse)
           return;
         this.#waitingForResponse = true;
+        this.buttonLoader();
         let response = await this.#client.put('sensor/' + this.#serviceId, {
           newStatus: (this.#status === 'on') ? 'off' : 'on'
         });
-        this.#waitingForResponse = false;
       }
       catch (e) {
         console.log(e.message)
         this.#waitingForResponse = false;
+      }
+    }
+    buttonLoader(){
+      try{
+        let element = document.getElementById('buttonCard_' + this.#serviceId)
+        let div = document.createElement('div');
+        div.className = 'spinner-border text-primary';
+        div.style['background-color'] = 'white';
+        div.style['z-index'] = '30';
+        element.appendChild(div);
+        this.#buttonLoader = div
+        this.#buttonLoaderTimeOut = setTimeout(() => {
+          this.#waitingForResponse = false;
+          div.remove();
+        }, 30000);
+      }
+      catch (e) {
+        console.log(e.message)
       }
     }
     update(payload) {
@@ -136,6 +156,13 @@
           status: payload.status,
           lastScanAt: payload.lastScanAt
         })
+      if(this.#waitingForResponse && this.#buttonLoader){
+        clearTimeout(this.#buttonLoaderTimeOut);
+        this.#buttonLoader.remove()
+        this.#waitingForResponse = false;
+      }
+
+      return this.#element;
     }
     registerRenderComponents() {
       const { BehaviorSubject } = rxjs;
@@ -168,8 +195,20 @@
       this.#statusObserver = statusObserver;
     }
 
-    temperatureChanged(){
-      console.log('ciaor')
+    async temperatureChanged(){
+      try{
+        if(this.#waitingForResponse)
+          return;
+        this.#waitingForResponse = true;
+        let response = await this.#client.put('sensor/' + this.#serviceId, {
+          workingTemperature: document.getElementById('temperatureSelector').value
+        });
+        this.#waitingForResponse = false;
+      }
+      catch (e) {
+        console.log(e.message)
+        this.#waitingForResponse = false;
+      }
     }
 
   }

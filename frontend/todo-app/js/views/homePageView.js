@@ -99,14 +99,15 @@
             const windowCard = new WindowCard(this.#client, params);
             let element = await windowCard.init();
             element.className = 'col-6';
-            element.setAttribute("style",'height: 150px');
+            element.style.height = '150px';
             this.#element.querySelector('#sensorCards').appendChild(element);
             windowCard.registerRenderComponents(); // init reactivity
             this.#components.set('windowCard',windowCard);
           }
           else{
             let component = this.#components.get('windowCard');
-            component.update(params);
+            let divUpdated = component.update(params);
+            divUpdated.style.height = '150px';
           }
           break;
         case 'DoorCard':
@@ -114,14 +115,15 @@
             const doorCard = new DoorCard(this.#client, params);
             let element = await doorCard.init();
             element.className = 'col-6';
-            element.setAttribute("style",'height: 150px');
+            element.style.height = '150px';
             this.#element.querySelector('#sensorCards').appendChild(element);
             doorCard.registerRenderComponents(); // init reactivity
             this.#components.set('doorCard',doorCard);
           }
           else{
             let component = this.#components.get('doorCard');
-            component.update(params);
+            let divUpdated = component.update(params);
+            divUpdated.style.height = '150px';
           }
           break;
         case 'HeatPumpCard':
@@ -129,14 +131,15 @@
             const heatPumpCard = new HeatPumpCard(this.#client, params);
             let element = await heatPumpCard.init()
             element.className = 'col-6';
-            element.setAttribute("style",'height: 150px');
+            element.style.height = '150px';
             this.#element.querySelector('#sensorCards').appendChild(element);
             heatPumpCard.registerRenderComponents(); // init reactivity
             this.#components.set('heatPumpCard',heatPumpCard);
           }
           else{
             let component = this.#components.get('heatPumpCard');
-            component.update(params);
+            let divUpdated = component.update(params);
+            divUpdated.style.height = '150px';
           }
           break;
         case 'WeatherCard':

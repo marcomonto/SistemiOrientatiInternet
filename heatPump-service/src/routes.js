@@ -77,7 +77,11 @@ export function routes(app, wss, config) {
 
   app.put('/api/status',async (req, res) => {
     try{
-      memoryService.setStatus(req.body.newStatus);
+      if(req.body.newStatus)
+        memoryService.setStatus(req.body.newStatus);
+      if(req.body.workingTemperature)
+        memoryService.setWorkingTemperature(Number(req.body.workingTemperature));
+      console.log(req.body)
       res.json({
         success: true
       })

@@ -3,8 +3,7 @@
 (function (win) {
 
   function mkUrl(baseUrl, path, queryParams) {
-    console.log(baseUrl,window.location.origin)
-    const url = new URL(baseUrl, window.location.origin);
+    const url = new URL(baseUrl,'http://localhost:8000');//window.location.origin)
     if (path) {
       const sep = url.pathname.endsWith('/') || path.startsWith('/') ? '' : '/';
       url.pathname += sep + path;

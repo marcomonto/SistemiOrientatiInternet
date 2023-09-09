@@ -112,6 +112,7 @@
           status: payload.status,
           lastScanAt: payload.lastScanAt
         })
+      return this.#element;
     }
     registerRenderComponents() {
       const { BehaviorSubject } = rxjs;

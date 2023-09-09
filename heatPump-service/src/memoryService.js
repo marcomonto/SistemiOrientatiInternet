@@ -25,5 +25,8 @@ class MemoryService {
   setStatus(newStatus){
     this.#status = newStatus;
   }
+  setWorkingTemperature(newWorkingTemperature){
+    this.#workingTemperature = newWorkingTemperature;
+  }
 
 } export default new MemoryService()

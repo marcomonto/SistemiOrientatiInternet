@@ -27,6 +27,7 @@
      */
     constructor(client, params) {
       super();
+      console.log(params)
       this.#client = client;
       this.#status = params.status;
       this.#serviceId = params.id;
@@ -47,10 +48,6 @@
       this.#element = document.createElement('div');
       this.#element.className = 'card';
       this.#element.id = 'card_' + this.#serviceId;
-      this.#element.setAttribute("style",
-        (this.#status === 'off' || this.#status === 'error') ?
-          "border-radius: 25px; border: 2px solid yellow;" :
-          "border-radius: 25px; border: 2px solid #73AD21;");
 
       // TITLE
       const title = document.createElement('div');
@@ -66,7 +63,6 @@
 
       const icon = document.createElement('i');
       icon.id = "iconCard_" + this.#serviceId;
-      icon.className = (this.#status === 'off' || this.#status === 'error') ? "bi bi-door-closed" : 'bi bi-door-open';
       icon.setAttribute("style", "margin-right: 5px;");
       title.appendChild(icon);
 
@@ -89,14 +85,32 @@
         "padding-bottom: 5px;");
       this.#element.appendChild(cardBody);
 
-      const openedLabel = document.createElement('a');
-      openedLabel.id = 'buttonCard_' + this.#serviceId;
-      openedLabel.className = 'btn btn-primary';
-      openedLabel.textContent = (this.#status === 'off' || this.#status === 'error') ? 'Open' : 'Close Door';
-      this.#element.appendChild(openedLabel);
+      const button = document.createElement('a');
+      button.id = 'buttonCard_' + this.#serviceId;
+      button.className = 'btn btn-primary';
+      this.#element.appendChild(button);
 
-      let hdlr = new Handler('click', openedLabel, () => this.buttonStatusClicked());
+      let hdlr = new Handler('click', button, () => this.buttonStatusClicked());
       this.#handlers.push(hdlr);
+
+      switch (this.#status) {
+        case 'on':
+          this.#element.setAttribute("style", "border-radius: 25px; border: 2px solid #73AD21;");
+          icon.className = 'bi bi-door-open';
+          button.textContent = 'Close'
+          break;
+        case 'off':
+          this.#element.setAttribute("style", "border-radius: 25px; border: 2px solid grey;");
+          icon.className = 'bi bi-door-closed';
+          button.textContent = 'Open';
+          break;
+        case 'error':
+          this.#element.setAttribute("style", "border-radius: 25px; border: 2px solid red;");
+          icon.className = 'bi bi-door-open';
+          button.textContent = 'Try to reconnect'
+          break;
+      }
+      console.log(this.#status, this.#element)
 
       return this.#element;
     }
@@ -121,6 +135,7 @@
           status: payload.status,
           lastScanAt: payload.lastScanAt
         })
+      return this.#element;
     }
     registerRenderComponents() {
       const { BehaviorSubject } = rxjs;
