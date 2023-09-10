@@ -17,6 +17,8 @@
     #rxjsSubscriptions = [];
     #statusObserver;
     #waitingForResponse = false;
+    #buttonLoader;
+    #buttonLoaderTimeOut;
 
     /**
      * Creates a new instance of `WindowCardComponent`.
@@ -37,8 +39,6 @@
       this.#element = document.createElement('div');
       this.#element.className = 'card';
       this.#element.id = 'card_' + this.#serviceId;
-      this.#element.setAttribute("style",
-        "  border-radius: 25px; border: 2px solid #73AD21;");
 
       // TITLE
       const title = document.createElement('div');
@@ -61,6 +61,7 @@
 
       const circle = document.createElement('div');
       circle.className = 'circle';
+      circle.id = 'circle_' + this.#serviceId;
       title.appendChild(circle);
 
       const labelLastScanAt = document.createElement('div');
@@ -78,14 +79,29 @@
         "padding-bottom: 5px;");
       this.#element.appendChild(cardBody);
 
-      const openedLabel = document.createElement('a');
-      openedLabel.id = 'buttonCard_' + this.#serviceId;
-      openedLabel.className = 'btn btn-primary';
-      openedLabel.textContent = (this.#status === 'off' || this.#status === 'error') ? 'Open' : 'Close';
-      this.#element.appendChild(openedLabel);
+      const button = document.createElement('a');
+      button.id = 'buttonCard_' + this.#serviceId;
+      button.className = 'btn btn-primary';
+      button.textContent = (this.#status === 'off' || this.#status === 'error') ? 'Open' : 'Close';
+      this.#element.appendChild(button);
 
-      let hdlr = new Handler('click', openedLabel, () => this.buttonStatusClicked());
+      let hdlr = new Handler('click', button, () => this.buttonStatusClicked());
       this.#handlers.push(hdlr);
+
+      switch (this.#status) {
+        case 'on':
+          this.#element.setAttribute("style", "border-radius: 25px; border: 2px solid #73AD21;");
+          button.textContent = 'Close'
+          break;
+        case 'off':
+          this.#element.setAttribute("style", "border-radius: 25px; border: 2px solid grey;");
+          button.textContent = 'Open';
+          break;
+        case 'error':
+          this.#element.setAttribute("style", "border-radius: 25px; border: 2px solid red;");
+          button.textContent = 'Try to reconnect'
+          break;
+      }
 
       return this.#element;
     }
@@ -96,6 +112,7 @@
         if(this.#waitingForResponse)
           return;
         this.#waitingForResponse = true;
+        this.buttonLoader();
         let response = await this.#client.put('sensor/' + this.#serviceId, {
           newStatus: (this.#status === 'on') ? 'off' : 'on'
         });
@@ -106,12 +123,35 @@
         this.#waitingForResponse = false;
       }
     }
+    buttonLoader(){
+      try{
+        let element = document.getElementById('buttonCard_' + this.#serviceId)
+        let div = document.createElement('div');
+        div.className = 'spinner-border text-primary';
+        div.style['background-color'] = 'white';
+        div.style['z-index'] = '30';
+        element.appendChild(div);
+        this.#buttonLoader = div
+        this.#buttonLoaderTimeOut = setTimeout(() => {
+          this.#waitingForResponse = false;
+          div.remove();
+        }, 30000);
+      }
+      catch (e) {
+        console.log(e.message)
+      }
+    }
     update(payload) {
       if(!!payload.status)
         this.#statusObserver.next({
           status: payload.status,
           lastScanAt: payload.lastScanAt
         })
+      if(this.#waitingForResponse && this.#buttonLoader){
+        clearTimeout(this.#buttonLoaderTimeOut);
+        this.#buttonLoader.remove()
+        this.#waitingForResponse = false;
+      }
       return this.#element;
     }
     registerRenderComponents() {
@@ -125,17 +165,17 @@
           switch (payload.status) {
             case 'on':
               elementToUpdate.setAttribute("style", "border-radius: 25px; border: 2px solid #73AD21;");
-              //iconToUpdate.className = 'bi bi-door-open';
+              document.getElementById('circle_' + this.#serviceId).style.display = 'inline'
               buttonToUpdate.textContent = 'Close'
               break;
             case 'off':
               elementToUpdate.setAttribute("style", "border-radius: 25px; border: 2px solid grey;");
-              //iconToUpdate.className = 'bi bi-door-closed';
+              document.getElementById('circle_' + this.#serviceId).style.display = 'inline'
               buttonToUpdate.textContent = 'Open'
               break;
             case 'error':
               elementToUpdate.setAttribute("style", "border-radius: 25px; border: 2px solid red;");
-              //iconToUpdate.className = 'bi bi-door-open';
+              document.getElementById('circle_' + this.#serviceId).style.display = 'none'
               buttonToUpdate.textContent = 'Try to reconnect'
               break;
           }

@@ -58,6 +58,7 @@ export default class Temperature {
         this.insideTemperature += (Math.abs(differenceTemperature) * variationPercentage);
         if (this.heatPump?.status === this.statusEnum.ON) {
           const difference = this.heatPump.workingTemperature - this.insideTemperature;
+          console.log(this.heatPump.workingTemperature, this.insideTemperature)
           if(difference >= 10 && difference < 12.5)
             this.insideTemperature += this.heatPump.workingTemperature * 0.02;
           else if(difference >= 12.5 && difference < 15)

@@ -20,6 +20,8 @@
     #rxjsSubscriptions = [];
     #statusObserver;
     #waitingForResponse = false;
+    #buttonLoader;
+    #buttonLoaderTimeOut;
 
 
     /**
@@ -68,6 +70,7 @@
 
       const circle = document.createElement('div');
       circle.className = 'circle';
+      circle.id = 'circle_' + this.#serviceId;
       title.appendChild(circle);
 
       const labelLastScanAt = document.createElement('div');
@@ -110,7 +113,6 @@
           button.textContent = 'Try to reconnect'
           break;
       }
-      console.log(this.#status, this.#element)
 
       return this.#element;
     }
@@ -119,14 +121,32 @@
         if(this.#waitingForResponse)
           return;
         this.#waitingForResponse = true;
+        this.buttonLoader();
         let response = await this.#client.put('sensor/' + this.#serviceId, {
           newStatus: (this.#status === 'on') ? 'off' : 'on'
         });
-        this.#waitingForResponse = false;
       }
       catch (e) {
         console.log(e)
         this.#waitingForResponse = false;
+      }
+    }
+    buttonLoader(){
+      try{
+        let element = document.getElementById('buttonCard_' + this.#serviceId)
+        let div = document.createElement('div');
+        div.className = 'spinner-border text-primary';
+        div.style['background-color'] = 'white';
+        div.style['z-index'] = '30';
+        element.appendChild(div);
+        this.#buttonLoader = div
+        this.#buttonLoaderTimeOut = setTimeout(() => {
+          this.#waitingForResponse = false;
+          div.remove();
+        }, 30000);
+      }
+      catch (e) {
+        console.log(e.message)
       }
     }
     update(payload) {
@@ -135,6 +155,11 @@
           status: payload.status,
           lastScanAt: payload.lastScanAt
         })
+      if(this.#waitingForResponse && this.#buttonLoader){
+        clearTimeout(this.#buttonLoaderTimeOut);
+        this.#buttonLoader.remove()
+        this.#waitingForResponse = false;
+      }
       return this.#element;
     }
     registerRenderComponents() {

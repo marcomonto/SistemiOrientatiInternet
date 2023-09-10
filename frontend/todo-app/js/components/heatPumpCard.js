@@ -70,6 +70,7 @@
 
       const circle = document.createElement('div');
       circle.className = 'circle';
+      circle.id = 'circle_' + this.#serviceId;
       title.appendChild(circle);
 
       const labelLastScanAt = document.createElement('div');
@@ -93,7 +94,6 @@
       const button = document.createElement('a');
       button.id = 'buttonCard_' + this.#serviceId;
       button.className = 'btn btn-primary';
-      button.textContent = (this.#status === 'off' || this.#status === 'error') ? 'Open' : 'Close';
       inputDiv.appendChild(button);
 
       const selectElement = document.createElement('select');
@@ -111,9 +111,21 @@
       let hdlr = new Handler('click', button, () => this.buttonStatusClicked());
       let hdlr2 = new Handler('change', selectElement, () => this.temperatureChanged());
       this.#handlers.push(hdlr,hdlr2);
-      console.log(this.#handlers);
-
       this.#element.appendChild(inputDiv);
+      switch (this.#status) {
+        case 'on':
+          this.#element.setAttribute("style", "border-radius: 25px; border: 2px solid #73AD21;");
+          button.textContent = 'Close'
+          break;
+        case 'off':
+          this.#element.setAttribute("style", "border-radius: 25px; border: 2px solid grey;");
+          button.textContent = 'Open';
+          break;
+        case 'error':
+          this.#element.setAttribute("style", "border-radius: 25px; border: 2px solid red;");
+          button.textContent = 'Try to reconnect'
+          break;
+      }
 
       return this.#element;
     }
@@ -197,8 +209,6 @@
 
     async temperatureChanged(){
       try{
-        if(this.#waitingForResponse)
-          return;
         this.#waitingForResponse = true;
         let response = await this.#client.put('sensor/' + this.#serviceId, {
           workingTemperature: document.getElementById('temperatureSelector').value
