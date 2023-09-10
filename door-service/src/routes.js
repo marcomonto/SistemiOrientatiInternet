@@ -78,6 +78,7 @@ export function routes(app, wss, config) {
   app.put('/api/status', async (req, res) => {
     try {
       memoryService.setStatus(req.body.newStatus);
+      console.log(memoryService.getStatus(), req.body.newStatus)
       res.json({
         success: true
       })

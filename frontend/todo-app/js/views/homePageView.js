@@ -95,17 +95,18 @@
     async renderDynamicComponent(componentType, params) {
       switch (componentType) {
         case 'WindowCard':
-          if(!this.#components.get('windowCard')){
+          const windowId = params.id
+          if(!this.#components.get('windowCard_' + windowId)){
             const windowCard = new WindowCard(this.#client, params);
             let element = await windowCard.init();
             element.className = 'col-6';
             element.style.height = '150px';
             this.#element.querySelector('#sensorCards').appendChild(element);
             windowCard.registerRenderComponents(); // init reactivity
-            this.#components.set('windowCard',windowCard);
+            this.#components.set('windowCard_' + windowId,windowCard);
           }
           else{
-            let component = this.#components.get('windowCard');
+            let component = this.#components.get('windowCard_' + windowId);
             let divUpdated = component.update(params);
             divUpdated.style.height = '150px';
           }

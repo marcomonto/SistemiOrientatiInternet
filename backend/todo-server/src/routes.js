@@ -85,6 +85,7 @@ export function routes(app,wss,  config) {
           newStatus: payload.newStatus,
           workingTemperature: payload.workingTemperature
       });
+      console.log(responseFromService, process.env.ACTUATOR_ADDRESS)
       return res.json({
         success: true,
         message: 'COMMAND_SENT'
@@ -101,7 +102,7 @@ export function routes(app,wss,  config) {
   wss.on('connection', (ws, req) => {
     try {
       const handler = new WebsocketHandler(ws, config, 'client');
-      memoryService.setWebsocketHandlerToClient(handler);
+      memoryService.addWebsocketHandler(handler);
       registerHandler(ws, handler);
     } catch (e) {
       console.error('💥 Failed to register WS handler, closing connection', e);

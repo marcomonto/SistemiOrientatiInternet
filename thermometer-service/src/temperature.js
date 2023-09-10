@@ -65,7 +65,7 @@ export default class Temperature {
             this.insideTemperature += this.heatPump.workingTemperature * 0.03;
           else if(difference >= 15 && difference < 17.5)
             this.insideTemperature += this.heatPump.workingTemperature * 0.04;
-          else if(difference >= 17.5 && difference < 20)
+          else if(difference >= 17.5)
             this.insideTemperature += this.heatPump.workingTemperature * 0.05;
           else
             this.insideTemperature += 0;

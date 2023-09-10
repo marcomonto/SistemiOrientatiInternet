@@ -16,13 +16,6 @@ services:
     networks:
       todo-app-network:
         ipv4_address: 10.88.0.22
-  actuator-service:
-    build: ./actuator-service
-    ports:
-      - 8006:8006
-    networks:
-      todo-app-network:
-        ipv4_address: 10.88.0.23
   door-service:
     build: ./door-service
     ports:
@@ -51,24 +44,52 @@ services:
     networks:
       todo-app-network:
         ipv4_address: 10.88.0.27
-  window-service:
+  window-service-first:
     build: ./window-service
     ports:
       - 8001:8001
     networks:
       todo-app-network:
         ipv4_address: 10.88.0.28
+  window-service-second:
+    build: ./window-service
+    ports:
+      - 8009:8009
+    environment:
+      - IFACE=10.88.0.29
+      - PORT=8009
+      - ERROR_PROB = 0
+      - DELAY_PROB = 0.2
+      - FREQ_MS = 2000
+      - TTL=3600
+    networks:
+      todo-app-network:
+        ipv4_address: 10.88.0.29
   # Backend
   todo-server:
     build: ./backend
     depends_on:
-      - pocketbase
+      pocketbase:
+        condition: service_started
     ports: 
       - 8000:8000
     networks:
       todo-app-network:
         #bind to apache proxy pass
         ipv4_address: 10.88.0.11
+  actuator-service:
+    build: ./actuator-service
+    ports:
+      - 8006:8006
+    environment:
+      - POCKETBASE_ADDRESS=http://10.88.0.22:8085
+      - IS_DOCKER_INSTANCE=true
+    networks:
+      todo-app-network:
+        ipv4_address: 10.88.0.23
+    depends_on:
+      pocketbase:
+        condition: service_started
 
 networks:
   todo-app-network:    

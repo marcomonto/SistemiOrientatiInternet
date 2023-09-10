@@ -101,26 +101,6 @@ export class WebsocketHandler extends EventEmitter {
   }
 
   /**
-   * Sends the temperature message.
-   * @private
-   */
-  _getInfoSensors() {
-    const msg = {type: 'update', payload: memoryService.getActiveServicesForUser()};
-    // message is always appended to the buffer
-    this.#buffer.push(msg);
-    // messages are dispatched immediately if delays are disabled or a random number is
-    // generated greater than `delayProb` messages
-    if (!this.#config.delays || Math.random() > this.#config.delayProb) {
-      for (const bMsg of this.#buffer) {
-        this._send(bMsg);
-      }
-      this.#buffer = [];
-    } else {
-      console.info(`💤 Due to network delays, ${this.#buffer.length} messages are still queued`, {handler: this.#name});
-    }
-  }
-
-  /**
    * Sends any message through the WebSocket channel.
    * @param msg Any message
    * @private

@@ -14,7 +14,7 @@ class MemoryService {
   };
   activeServices = [];
   notActiveServices = [];
-  websocketClientHandler;
+  websocketClientHandler = [];
   #databaseConnection = null;
 
   constructor() {
@@ -28,21 +28,14 @@ class MemoryService {
     ];
   }
 
-  setWebsocketHandlerToClient(handler) {
-    this.websocketClientHandler = handler;
-  }
-
-  sendMessageToClient(msg) {
-    /*   if(!!this.websocketClientHandler)
-         this.websocketClientHandler._send(JSON.stringify(msg))
-       else
-         console.log('non ho clientHandler')*/
+  addWebsocketHandler(handler) {
+    this.websocketClientHandler.push(handler);
   }
 
   updateWebsocketClients(idServiceUpdated) {
     let service = this.activeServices.find(el => el.id === idServiceUpdated);
-    if (!!this.websocketClientHandler) {
-      this.websocketClientHandler.send(
+    if (!!this.websocketClientHandler && this.websocketClientHandler.length > 0) {
+      this.websocketClientHandler.forEach(el => el.send(
         {
           type: this.messageType.SERVICE,
           payload: {
@@ -54,7 +47,7 @@ class MemoryService {
             id: service.id
           }
         }
-      );
+      ));
     }
   }
 
