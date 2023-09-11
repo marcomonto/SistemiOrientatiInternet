@@ -1,7 +1,7 @@
 {
   "name": "todo-server",
   "version": "2.0.0",
-  "description": "REST APIs for the TODO web application",
+  "description": "REST APIs for the web application",
   "main": "src/server.js",
   "type": "module",
   "scripts": {

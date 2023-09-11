@@ -9,8 +9,8 @@ const directories = [
   "heatPump-service",
   "thermometer-service",
   "actuator-service",
-  "backend/todo-server",
-  "frontend/todo-app",
+  "backend/server",
+  "frontend/app",
 ];
 
 (async function () {
@@ -25,7 +25,7 @@ const directories = [
 function startInDirectory(directory) {
   let command;
   if (directory === 'pocketbase') command = 'docker run  -p 8085:8085 pocketbase';
-  else if (directory === 'frontend/todo-app') command = 'http-server . -c-1'
+  else if (directory === 'frontend/app') command = 'http-server . -c-1'
   else command = 'npm run start';
   const options = {cwd: path.join(__dirname, directory)};
 

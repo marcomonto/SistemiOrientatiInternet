@@ -1,12 +1,12 @@
 version: "3.9"
 services: 
   # Frontend
-  todo-app:
+  app:
     build: ./frontend
     ports: 
       - 8080:80
     networks:
-      todo-app-network:
+      app-network:
         ipv4_address: 10.88.0.21
   #Database
   pocketbase:
@@ -14,7 +14,7 @@ services:
     ports:
       - 8085:8085
     networks:
-      todo-app-network:
+      app-network:
         ipv4_address: 10.88.0.22
   door-service:
     build: ./door-service
@@ -23,7 +23,7 @@ services:
     environment:
       - TTL=110
     networks:
-      todo-app-network:
+      app-network:
         ipv4_address: 10.88.0.24
   heat-pump-service:
     build: ./heatPump-service
@@ -32,7 +32,7 @@ services:
     environment:
       - TTL=150
     networks:
-      todo-app-network:
+      app-network:
         ipv4_address: 10.88.0.25
   weather-service:
     build: ./weather-service-master
@@ -41,7 +41,7 @@ services:
     environment:
       - TTL=90
     networks:
-      todo-app-network:
+      app-network:
         ipv4_address: 10.88.0.26
   thermometer-service:
     build: ./thermometer-service
@@ -50,7 +50,7 @@ services:
     environment:
       - TTL=80
     networks:
-      todo-app-network:
+      app-network:
         ipv4_address: 10.88.0.27
   window-service-first:
     build: ./window-service
@@ -59,7 +59,7 @@ services:
     environment:
       - TTL=120
     networks:
-      todo-app-network:
+      app-network:
         ipv4_address: 10.88.0.28
   window-service-second:
     build: ./window-service
@@ -73,10 +73,10 @@ services:
       - FREQ_MS = 2000
       - TTL=3600
     networks:
-      todo-app-network:
+      app-network:
         ipv4_address: 10.88.0.29
   # Backend
-  todo-server:
+  server:
     build: ./backend
     depends_on:
       pocketbase:
@@ -84,7 +84,7 @@ services:
     ports: 
       - 8000:8000
     networks:
-      todo-app-network:
+      app-network:
         #bind to apache proxy pass
         ipv4_address: 10.88.0.11
   actuator-service:
@@ -95,15 +95,15 @@ services:
       - POCKETBASE_ADDRESS=http://10.88.0.22:8085
       - IS_DOCKER_INSTANCE=true
     networks:
-      todo-app-network:
+      app-network:
         ipv4_address: 10.88.0.23
     depends_on:
       pocketbase:
         condition: service_started
 
 networks:
-  todo-app-network:    
-      name: todo-app-network
+  app-network:
+      name: app-network
       driver: bridge
       ipam:
         config:
