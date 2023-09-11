@@ -20,6 +20,8 @@ services:
     build: ./door-service
     ports:
       - 8003:8003
+    environment:
+      - TTL=110
     networks:
       todo-app-network:
         ipv4_address: 10.88.0.24
@@ -27,6 +29,8 @@ services:
     build: ./heatPump-service
     ports:
       - 8004:8004
+    environment:
+      - TTL=150
     networks:
       todo-app-network:
         ipv4_address: 10.88.0.25
@@ -34,6 +38,8 @@ services:
     build: ./weather-service-master
     ports:
       - 8002:8002
+    environment:
+      - TTL=90
     networks:
       todo-app-network:
         ipv4_address: 10.88.0.26
@@ -41,6 +47,8 @@ services:
     build: ./thermometer-service
     ports:
       - 8005:8005
+    environment:
+      - TTL=80
     networks:
       todo-app-network:
         ipv4_address: 10.88.0.27
@@ -48,6 +56,8 @@ services:
     build: ./window-service
     ports:
       - 8001:8001
+    environment:
+      - TTL=120
     networks:
       todo-app-network:
         ipv4_address: 10.88.0.28

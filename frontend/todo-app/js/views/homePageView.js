@@ -33,19 +33,8 @@
     async init() {
       this.#element = document.createElement('div');
       this.#element.innerHTML = document.querySelector('script#homePage-template').textContent;
-      const btn = this.#element.querySelector('button');
-      const hdlr = new Handler('click', btn, () => this.test());
-      this.#handlers.push(hdlr);
       this.connectWebSocket();
       return this.#element;
-    }
-
-    async test() {
-      try {
-        let response = await this.#client.get('updateInfo')
-      } catch (err) {
-        console.log(err)
-      }
     }
 
     connectWebSocket() {

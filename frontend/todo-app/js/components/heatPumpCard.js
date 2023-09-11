@@ -98,6 +98,9 @@
 
       const selectElement = document.createElement('select');
       selectElement.id = 'temperatureSelector';
+      console.log(this.#workingTemperature)
+      if(this.#workingTemperature)
+        selectElement.value = this.#workingTemperature
 
       for (let temperature = 30; temperature <= 50; temperature += 5) {
         const option = document.createElement('option');
