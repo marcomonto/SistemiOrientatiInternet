@@ -98,17 +98,15 @@
 
       const selectElement = document.createElement('select');
       selectElement.id = 'temperatureSelector';
-      console.log(this.#workingTemperature)
-      if(this.#workingTemperature)
-        selectElement.value = this.#workingTemperature
 
       for (let temperature = 30; temperature <= 50; temperature += 5) {
         const option = document.createElement('option');
-        option.value = temperature;
+        option.value = String(temperature);
         option.text = `${temperature}°C`;
         selectElement.appendChild(option);
       }
 
+      selectElement.value = String(this.#workingTemperature);
       inputDiv.appendChild(selectElement);
 
       let hdlr = new Handler('click', button, () => this.buttonStatusClicked());

@@ -29,7 +29,6 @@
      */
     constructor(client, params) {
       super();
-      console.log(params)
       this.#client = client;
       this.#status = params.status;
       this.#serviceId = params.id;

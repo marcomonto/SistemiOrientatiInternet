@@ -116,7 +116,6 @@
         let response = await this.#client.put('sensor/' + this.#serviceId, {
           newStatus: (this.#status === 'on') ? 'off' : 'on'
         });
-        this.#waitingForResponse = false;
       }
       catch (e) {
         console.log(e)
