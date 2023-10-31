@@ -66,7 +66,7 @@ function registerHandler(ws, handler) {
  */
 export function routes(app, wss, config) {
 
-  wss.on('connection', ws => {
+/*  wss.on('connection', ws => {
     try {
       const handler = new WebSocketHandler(ws, config, `weather:${uuid()}`);
       registerHandler(ws, handler);
@@ -74,7 +74,7 @@ export function routes(app, wss, config) {
       console.error('💥 Failed to register WS handler, closing connection', e);
       ws.close();
     }
-  });
+  });*/
 
   app.post('/api/sensor/:id',async (req, res) => {
     try{

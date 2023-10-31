@@ -77,7 +77,7 @@ export class WebSocketHandler extends EventEmitter {
     console.debug('New connection received', {handler: this.#name});
 
     if (this.#config.failures && this.#config.timeToLive > 0) {
-      //this._scheduleDeath();
+      this._scheduleDeath();
     }
   }
   _scheduleDeath() {

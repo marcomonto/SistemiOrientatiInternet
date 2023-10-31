@@ -2,8 +2,9 @@
 import jwt from 'jsonwebtoken';
 import {WebsocketHandler} from "./websocketHandler.js";
 import memoryService from "./memoryService.js";
-import {auth} from "google-auth-library";
+import validator from "validator";
 import axios from "axios";
+import {subscribeToServices} from "./websocketSubscriberToServices.js";
 
 /**
  * Initializes routes.
@@ -17,33 +18,45 @@ export function routes(app,wss,  config) {
     res.sendStatus(401);
 
   app.post('/api/login', (req, res) => {
-    const {username, password} = req.body;
-    if (!username || !password)
-      return res.status(403).json({
-        success: false,
-        message: 'user or password not provided'
-      })
-    if (username === 'marcomonto' && password === 'password') {
-      let jwtSecretKey = process.env.JWT_SECRET_KEY;
-      let data = {
-        time: Date(),
-        user: username,
-      }
-      const token = jwt.sign(data, jwtSecretKey);
-      return res
-        .cookie("tokenLookout", token, {
-          httpOnly: true,
-          //secure: true,
-          maxAge: 365 * 24 * 60 * 60 * 1000
-        }).json({
-          success: true,
-          payload: 'ciao'
+    try {
+      const {username, password} = req.body;
+      if (!username || !password)
+        return res.status(401).json({
+          success: false,
+          message: 'user or password not provided'
         })
-    } else
-      res.status(403).json({
+      if (!validator.isAlpha(username))
+        return res.status(400).json({
+          success: false,
+          message: 'invalid parameters'
+        });
+      if (username === 'marcomonto' && password === 'password') {
+        let jwtSecretKey = process.env.JWT_SECRET_KEY;
+        let data = {
+          time: Date(),
+          user: username,
+        }
+        const token = jwt.sign(data, jwtSecretKey);
+        return res
+          .cookie("tokenLookout", token, {
+            httpOnly: true,
+            //secure: true,
+            maxAge: 365 * 24 * 60 * 60 * 1000
+          }).json({
+            success: true,
+          })
+      } else
+        res.status(403).json({
+          success: false,
+          message: 'CREDENTIALS_NOT_CORRECT'
+        })
+    }
+    catch (e) {
+      console.log(e.message)
+      return res.status(500).json({
         success: false,
-        message: 'CREDENTIALS_NOT_CORRECT'
       })
+    }
   });
 
   app.get('/api/home', authenticated, (req, res) => {
@@ -52,7 +65,10 @@ export function routes(app,wss,  config) {
         success: true,
       })
     } catch (e) {
-      console.log(e)
+      console.log(e.message)
+      return res.status(500).json({
+        success: false,
+      })
     }
   });
 
@@ -63,6 +79,9 @@ export function routes(app,wss,  config) {
       })
     } catch (e) {
       console.log(e)
+      return res.status(500).json({
+        success: false,
+      })
     }
   });
 
@@ -77,23 +96,83 @@ export function routes(app,wss,  config) {
     }
   });
 
+  app.get('/api/sensors/tryToReconnect/:id' ,(req, res) => {
+    try {
+      if(!validator.isAlphanumeric(req.params.id)
+        || !memoryService.activeServices.find(el => el.id == req.params.id)
+        || memoryService.activeServices.find(el => el.id == req.params.id).status != 'error')
+        return res.status(400).json({
+          success: false,
+          message: 'invalid parameters'
+        });
+      let serviceToRestore = memoryService.activeServices.find(el => el.id === req.params.id);
+      setTimeout(() => {
+        subscribeToServices([{
+          ...serviceToRestore
+        }]);
+        return res.json({
+          success: true,
+        })
+      }, 2000);
+    } catch (e) {
+      console.log(e)
+      return res.status(500).json({
+        success: false,
+      })
+    }
+  });
+
   app.put('/api/sensor/:id', authenticated, async (req, res) => {
     try{
       const payload = req.body;
-      let responseFromService = axios.post(
+      if(!validator.isAlphanumeric(req.params.id) ||
+        (!!payload.newStatus && !['on','off','error'].contains(payload.newStatus)) ||
+        (!!payload.workingTemperature && !['30','35','40','45','50'].contains(payload.workingTemperature))
+      )
+        return res.status(400).json({
+          success: false,
+          message: 'invalid parameters'
+        });
+      let responseFromService = await axios.post(
         process.env.ACTUATOR_ADDRESS + '/api/sensor/' + req.params.id,{
           newStatus: payload.newStatus,
           workingTemperature: payload.workingTemperature
       });
-      console.log(responseFromService, process.env.ACTUATOR_ADDRESS)
       return res.json({
         success: true,
         message: 'COMMAND_SENT'
       })
     }
     catch (e) {
-      console.log(e.message)
-      res.json({
+      res.status(500).json({
+        success: false
+      })
+    }
+  });
+
+  app.post('/api/addSensor', authenticated, async (req, res) => {
+    try{
+      const payload = req.body;
+      if(!validator.isAlphanumeric(req.params.id) ||
+        (!!payload.newStatus && !['on','off','error'].contains(payload.newStatus)) ||
+        (!!payload.workingTemperature && !['30','35','40','45','50'].contains(payload.workingTemperature))
+      )
+        return res.status(400).json({
+          success: false,
+          message: 'invalid parameters'
+        });
+      let responseFromService = await axios.post(
+        process.env.ACTUATOR_ADDRESS + '/api/sensor/' + req.params.id,{
+          newStatus: payload.newStatus,
+          workingTemperature: payload.workingTemperature
+        });
+      return res.json({
+        success: true,
+        message: 'COMMAND_SENT'
+      })
+    }
+    catch (e) {
+      res.status(500).json({
         success: false
       })
     }

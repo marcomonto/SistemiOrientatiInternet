@@ -79,7 +79,7 @@ export class WebSocketHandler extends EventEmitter {
 
     // simulate a client disconnection
     if (this.#config.failures && this.#config.timeToLive > 0) {
-      //this._scheduleDeath();
+      this._scheduleDeath();
     }
   }
 

@@ -7,6 +7,9 @@ export function subscribeToServices(services) {
     // Event: WebSocket connection opened
     ws.on('open', () => {
       console.log('Connected to the websocket server with address ' + service.serviceType);
+      if (!memoryService.activeServices.find(el => el.id === service.id)) {
+        memoryService.activeServices.push(service);
+      }
       if (service.serviceType === memoryService.serviceTypes.WEATHER) {
         ws.send(JSON.stringify({type: 'subscribe', target: 'temperature'}));
       } else if (service.serviceType === memoryService.serviceTypes.DOOR) {
@@ -22,36 +25,28 @@ export function subscribeToServices(services) {
     ws.on('message', (data) => {
       try {
         const message = JSON.parse(data);
-        if (!memoryService.activeServices.find(el => el.id === service.id)) {
-          memoryService.notActiveServices = memoryService.notActiveServices.filter(el => el.id !== service.id)
-          memoryService.activeServices.push(service);
-        }
         if (!!message.payload) {
           const payload = message.payload;
+          let activeServiceStored = memoryService.activeServices.find(el => el.id === service.id);
           if (service.serviceType === memoryService.serviceTypes.WEATHER) {
-            let activeServiceStored = memoryService.activeServices.find(el => el.id === service.id);
             activeServiceStored.lastScanAt = payload.dateTime;
             activeServiceStored.value = payload.value;
             memoryService.getDatabaseConnection().store('weatherTemperatures', {value: Number(payload.value)});
             memoryService.updateWebsocketClients(service.id)
           } else if (service.serviceType === memoryService.serviceTypes.DOOR) {
-            let activeServiceStored = memoryService.activeServices.find(el => el.id === service.id);
             activeServiceStored.lastScanAt = payload.lastScanAt;
             activeServiceStored.status = payload.status;
             memoryService.updateWebsocketClients(service.id);
           } else if (service.serviceType === memoryService.serviceTypes.WINDOW) {
-            let activeServiceStored = memoryService.activeServices.find(el => el.id === service.id);
             activeServiceStored.lastScanAt = payload.lastScanAt;
             activeServiceStored.status = payload.status;
             memoryService.updateWebsocketClients(service.id);
           } else if (service.serviceType === memoryService.serviceTypes.HEAT_PUMP) {
-            let activeServiceStored = memoryService.activeServices.find(el => el.id === service.id);
             activeServiceStored.lastScanAt = payload.lastScanAt;
             activeServiceStored.status = payload.status;
             activeServiceStored.workingTemperature = payload.workingTemperature;
             memoryService.updateWebsocketClients(service.id);
           } else if (service.serviceType === memoryService.serviceTypes.THERMOMETER) {
-            let activeServiceStored = memoryService.activeServices.find(el => el.id === service.id);
             activeServiceStored.lastScanAt = payload.lastScanAt;
             activeServiceStored.value = payload.value;
             memoryService.getDatabaseConnection().store('homeTemperatures', {value: Number(payload.value)});
@@ -63,37 +58,39 @@ export function subscribeToServices(services) {
       }
     });
     ws.on('close', (code) => {
-      if (service.serviceType === memoryService.serviceTypes.DOOR) {
         let activeServiceStored = memoryService.activeServices.find(el => el.id === service.id);
         activeServiceStored.status = 'error';
-        memoryService.updateWebsocketClients(service.id);
-      } else if (service.serviceType === memoryService.serviceTypes.WINDOW) {
-        let activeServiceStored = memoryService.activeServices.find(el => el.id === service.id);
-        activeServiceStored.status = 'error';
-        memoryService.updateWebsocketClients(service.id);
-      } else if (service.serviceType === memoryService.serviceTypes.HEAT_PUMP) {
-        let activeServiceStored = memoryService.activeServices.find(el => el.id === service.id);
-        activeServiceStored.status = 'error';
-        memoryService.updateWebsocketClients(service.id);
-      }
-      console.log('I will retry to connect in 30s... to' + service.serviceType)
-      setTimeout(() => subscribeToServices([{
+        if (service.serviceType === memoryService.serviceTypes.DOOR
+          || service.serviceType === memoryService.serviceTypes.WINDOW
+          || service.serviceType === memoryService.serviceTypes.HEAT_PUMP
+        )
+          memoryService.updateWebsocketClients(service.id);
+/*      setTimeout(() => subscribeToServices([{
         ...service,
         tries: !!service.tries ? (service.tries + 1) : 1
-      }]), 30000);
+      }]), 30000);*/
     });
     ws.on('error', (error) => {
       console.log(error, error.code)
-      if (error.code === 'ECONNREFUSED') {
+      let activeServiceStored = memoryService.activeServices.find(el => el.id === service.id);
+      activeServiceStored.status = 'error';
+      if (service.serviceType === memoryService.serviceTypes.DOOR
+        || service.serviceType === memoryService.serviceTypes.WINDOW
+        || service.serviceType === memoryService.serviceTypes.HEAT_PUMP
+      )
+        memoryService.updateWebsocketClients(service.id);
+/*      if (error.code === 'ECONNREFUSED') {
         if (!service.tries || service.tries < 3) {
-          console.log('I will retry to connect in 30s...')
           setTimeout(() => subscribeToServices([{
             ...service,
             tries: !!service.tries ? (service.tries + 1) : 1
           }]), 30000);
-        } else
+        } else{
           console.log('too many tries for' + service.serviceType)
-      }
+          memoryService.notActiveServices.push(service);
+          ws.close();
+        }
+      }*/
     });
   }
 }

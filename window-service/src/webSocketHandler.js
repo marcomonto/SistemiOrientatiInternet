@@ -114,18 +114,6 @@ export class WebSocketHandler extends EventEmitter {
   }
 
   /**
-   * Generates a random delay in milliseconds.
-   * @return {number} Milliseconds
-   * @private
-   */
-
-  /*
-  _someMillis() {
-    return anIntegerWithPrecision(this.#config.frequency, 0.2);
-  }
-*/
-
-  /**
    * Sends the temperature message.
    * @private
    */
@@ -167,8 +155,6 @@ export class WebSocketHandler extends EventEmitter {
     if (this.#timeout) {
       return;
     }
-
-    console.debug('🌡  Subscribing to temperature', {handler: this.#name});
     const callback = () => {
       this._sendData();
       this.#timeout = setTimeout(callback, 5000);
