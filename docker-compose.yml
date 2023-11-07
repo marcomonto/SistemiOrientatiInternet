@@ -1,5 +1,10 @@
 version: "3.9"
-services: 
+
+volumes:
+  ciaociao:
+    name: ciaociao
+
+services:
   # Frontend
   app:
     build: ./frontend
@@ -16,6 +21,8 @@ services:
     networks:
       app-network:
         ipv4_address: 10.88.0.22
+    volumes:
+      - ciaociao:/pb_data
   door-service:
     build: ./door-service
     ports:
