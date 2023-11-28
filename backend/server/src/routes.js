@@ -12,9 +12,9 @@ import {subscribeToServices} from "./websocketSubscriberToServices.js";
  * @param {WebSocketServer} wss WebSocket server
  * @param {{iface: string, port: number, auth: boolean, oidc: {redirect: string, clientId: string, secret: string}}} config Configuration options
  */
-export function routes(app,wss,  config) {
+export function routes(app, wss, config) {
   const authenticated = (req, res, next) => req.cookies?.tokenLookout ?
-    (jwt.verify(req.cookies.tokenLookout , config.jwtSecretKey) ? next() : res.sendStatus(401)) :
+    (jwt.verify(req.cookies.tokenLookout, config.jwtSecretKey) ? next() : res.sendStatus(401)) :
     res.sendStatus(401);
 
   app.post('/api/login', (req, res) => {
@@ -50,8 +50,7 @@ export function routes(app,wss,  config) {
           success: false,
           message: 'CREDENTIALS_NOT_CORRECT'
         })
-    }
-    catch (e) {
+    } catch (e) {
       console.log(e.message)
       return res.status(500).json({
         success: false,
@@ -85,7 +84,7 @@ export function routes(app,wss,  config) {
     }
   });
 
-  app.get('/api/sensors' ,(req, res) => {
+  app.get('/api/sensors', (req, res) => {
     try {
       return res.json({
         success: true,
@@ -96,9 +95,9 @@ export function routes(app,wss,  config) {
     }
   });
 
-  app.get('/api/sensors/tryToReconnect/:id' ,(req, res) => {
+  app.put('/api/sensors/tryToReconnect/:id', (req, res) => {
     try {
-      if(!validator.isAlphanumeric(req.params.id)
+      if (!validator.isAlphanumeric(req.params.id)
         || !memoryService.activeServices.find(el => el.id == req.params.id)
         || memoryService.activeServices.find(el => el.id == req.params.id).status != 'error')
         return res.status(400).json({
@@ -123,61 +122,58 @@ export function routes(app,wss,  config) {
   });
 
   app.put('/api/sensor/:id', authenticated, async (req, res) => {
-    try{
+    try {
       const payload = req.body;
-      if(!validator.isAlphanumeric(req.params.id) ||
-        (!!payload.newStatus && !['on','off','error'].contains(payload.newStatus)) ||
-        (!!payload.workingTemperature && !['30','35','40','45','50'].contains(payload.workingTemperature))
+      if (!validator.isAlphanumeric(req.params.id) ||
+        (!!payload.newStatus && !['on', 'off', 'error'].includes(payload.newStatus)) ||
+        (!!payload.workingTemperature && !['30', '35', '40', '45', '50'].includes(payload.workingTemperature))
       )
         return res.status(400).json({
           success: false,
           message: 'invalid parameters'
         });
       let responseFromService = await axios.post(
-        process.env.ACTUATOR_ADDRESS + '/api/sensor/' + req.params.id,{
+        process.env.ACTUATOR_ADDRESS + '/api/sensor/' + req.params.id, {
           newStatus: payload.newStatus,
           workingTemperature: payload.workingTemperature
+        });
+      return res.json({
+        success: true,
+        message: 'COMMAND_SENT'
+      })
+    } catch (e) {
+      console.log(e.message)
+      res.status(500).json({
+        success: false
+      })
+    }
+  });
+
+  app.post('/api/sensor', async (req, res) => {
+    try {
+      const payload = req.body;
+      if (!payload.type || !payload.address || !['window', 'door'].includes(payload.type)) {
+        return res.status(400).json({
+          success: false,
+          message: 'invalid parameters'
+        });
+      }
+      let databaseConnection = memoryService.getDatabaseConnection();
+      console.log(databaseConnection)
+      let databaseResponse = await databaseConnection.store('availableServices',{
+        address: payload.address,
+        type: payload.type
       });
-      return res.json({
-        success: true,
-        message: 'COMMAND_SENT'
-      })
-    }
-    catch (e) {
-      res.status(500).json({
+      console.log(databaseResponse)
+
+      return res.json(databaseResponse)
+    } catch (e) {
+      console.log(e.message)
+      res.json({
         success: false
       })
     }
   });
-
-  app.post('/api/addSensor', authenticated, async (req, res) => {
-    try{
-      const payload = req.body;
-      if(!validator.isAlphanumeric(req.params.id) ||
-        (!!payload.newStatus && !['on','off','error'].contains(payload.newStatus)) ||
-        (!!payload.workingTemperature && !['30','35','40','45','50'].contains(payload.workingTemperature))
-      )
-        return res.status(400).json({
-          success: false,
-          message: 'invalid parameters'
-        });
-      let responseFromService = await axios.post(
-        process.env.ACTUATOR_ADDRESS + '/api/sensor/' + req.params.id,{
-          newStatus: payload.newStatus,
-          workingTemperature: payload.workingTemperature
-        });
-      return res.json({
-        success: true,
-        message: 'COMMAND_SENT'
-      })
-    }
-    catch (e) {
-      res.status(500).json({
-        success: false
-      })
-    }
-  });
-
   wss.on('connection', (ws, req) => {
     try {
       const handler = new WebsocketHandler(ws, config, 'client');
@@ -205,7 +201,7 @@ function registerHandler(ws, handler) {
   };
 
   function pingCb() {
-    console.trace('🏐 Ping-Pong', {handler:handler.name},);
+    console.trace('🏐 Ping-Pong', {handler: handler.name},);
     ws.pong();
   }
 
@@ -213,18 +209,18 @@ function registerHandler(ws, handler) {
     try {
       handler.onMessage(msg);
     } catch (e) {
-      console.error('💢 Unexpected error while handling inbound message', {handler:handler.name}, e);
+      console.error('💢 Unexpected error while handling inbound message', {handler: handler.name}, e);
     }
   }
 
   function closeCb() {
-    console.info('⛔ WebSocket closed', {handler:handler.name},);
+    console.info('⛔ WebSocket closed', {handler: handler.name},);
     handler.stop();
     removeAllListeners();
   }
 
   function errorCb(err) {
-    console.error('💥 Error occurred', {handler:handler.name}, err);
+    console.error('💥 Error occurred', {handler: handler.name}, err);
     handler.stop();
     removeAllListeners();
     ws.close();

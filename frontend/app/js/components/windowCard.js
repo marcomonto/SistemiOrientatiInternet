@@ -113,9 +113,14 @@
           return;
         this.#waitingForResponse = true;
         this.buttonLoader();
-        let response = await this.#client.put('sensor/' + this.#serviceId, {
-          newStatus: (this.#status === 'on') ? 'off' : 'on'
-        });
+        if(this.#status == 'error'){
+          let response = await this.#client.put('sensors/tryToReconnect/' + this.#serviceId);
+        }
+        else{
+          let response = await this.#client.put('sensor/' + this.#serviceId, {
+            newStatus: (this.#status === 'on') ? 'off' : 'on'
+          });
+        }
       }
       catch (e) {
         console.log(e)

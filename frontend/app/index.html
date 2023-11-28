@@ -132,6 +132,10 @@
       <main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
           <h1 class="h2">Dashboard</h1>
+
+          <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addSensorModal">
+            Add Sensor
+          </button>
         </div>
         <div class="container">
           <div id="temperatureCards" class="row"></div>
@@ -139,8 +143,37 @@
         </div>
       </main>
     </div>
+
   </div>
 </script>
+
+<div class="modal fade" id="addSensorModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="input-group mb-3">
+          <div class="input-group-prepend">
+            <span class="input-group-text" id="basic-addon1">Ip with port</span>
+          </div>
+          <input type="text" class="form-control" placeholder="Username" aria-label="Username" aria-describedby="basic-addon1" id="sensorToAddAddress">
+        </div>
+        <select class="form-select form-select-lg mb-3" aria-label=".form-select-lg example" id="sensorToAddType">
+          <option selected>Open this select menu</option>
+          <option value="door">Door</option>
+          <option value="window">Window</option>
+        </select>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="confirmAddSensorButton">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 
 <script src="js/vendor/modernizr-3.11.2.min.js"></script>

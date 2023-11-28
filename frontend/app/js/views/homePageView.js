@@ -16,6 +16,9 @@
     constructor(client) {
       super();
       this.#client = client;
+      document.getElementById('confirmAddSensorButton').addEventListener('click',
+        () => this.addSensor(document.getElementById('sensorToAddAddress').value,document.getElementById('sensorToAddType').value)
+      );
     }
 
     /**
@@ -35,6 +38,19 @@
       this.#element.innerHTML = document.querySelector('script#homePage-template').textContent;
       this.connectWebSocket();
       return this.#element;
+    }
+
+    /**
+     * @param {string} address - The address of the sensor.
+     * @param {string} type - The type of the sensor.
+     */
+    async addSensor(address, type){
+      let response = await this.#client.post('sensor',{
+        address: address,
+        type: type
+      });
+      console.log(response)
+      console.log(address,type)
     }
 
     connectWebSocket() {

@@ -15,6 +15,7 @@
     }
   }
 
+
   /**
    * An event handler that keeps track of the callback reference added
    * to an HTML element using `addEventListener` and removed with
