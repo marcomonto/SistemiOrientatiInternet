@@ -1,6 +1,6 @@
 `use strict`;
 (function (win) {
-  class HomePageView extends EventEmitter {
+  class HistoricalDataView extends EventEmitter {
     /** @type {HTMLElement} */
     #element;
     /** @type {RestClient} */
@@ -16,9 +16,6 @@
     constructor(client) {
       super();
       this.#client = client;
-      document.getElementById('confirmAddSensorButton').addEventListener('click',
-        () => this.addSensor(document.getElementById('sensorToAddAddress').value,document.getElementById('sensorToAddType').value)
-      );
     }
 
     /**
@@ -35,66 +32,8 @@
      */
     async init() {
       this.#element = document.createElement('div');
-      this.#element.innerHTML = document.querySelector('script#homePage-template').textContent;
-      this.connectWebSocket();
+      this.#element.innerHTML = document.querySelector('script#historical-data-template').textContent;
       return this.#element;
-    }
-
-    /**
-     * @param {string} address - The address of the sensor.
-     * @param {string} type - The type of the sensor.
-     */
-    async addSensor(address, type){
-      let response = await this.#client.post('sensor',{
-        address: address,
-        type: type
-      });
-      console.log(response)
-      console.log(address,type)
-    }
-
-    connectWebSocket() {
-      const socket = new WebSocket('ws://'+ window.location.hostname +':8000'); // Replace with your WebSocket server URL
-      // WebSocket event handlers
-      socket.onopen = () => {
-        // Send a message to the WebSocket server
-        socket.send(JSON.stringify({
-          type: 'subscribe'
-        }));
-      };
-      socket.onmessage =  (event) => {
-        try {
-          let message = JSON.parse(event.data);
-          let serviceType = message.payload.serviceType;
-          let data = message.payload;
-          switch (serviceType) {
-            case 'weather':
-              this.renderDynamicComponent('WeatherCard', data);
-              break;
-            case 'window':
-              this.renderDynamicComponent('WindowCard',data);
-              break;
-            case'door':
-              this.renderDynamicComponent('DoorCard', data);
-              break;
-            case 'heatPump':
-              this.renderDynamicComponent('HeatPumpCard', data);
-              break;
-            case 'thermometer':
-              this.renderDynamicComponent('ThermometerCard', data);
-              break;
-            default:
-              break;
-          }
-        } catch (e) {
-          console.log(e)
-        }
-
-      };
-      socket.onclose = function () {
-        console.log('WebSocket connection closed.');
-      };
-
     }
 
     async renderDynamicComponent(componentType, params) {
@@ -148,21 +87,6 @@
             divUpdated.style.height = '150px';
           }
           break;
-        case 'WeatherCard':
-        case 'ThermometerCard':
-          if(!this.#components.get('weatherCard')){
-            const weatherCard = new WeatherCard(this.#client, params);
-            let element = await weatherCard.init()
-            element.className = 'col-12';
-            this.#element.querySelector('#temperatureCards').appendChild(element);
-            weatherCard.registerRenderComponents(); // init reactivity
-            this.#components.set('weatherCard',weatherCard);
-          }
-          else{
-            let component = this.#components.get('weatherCard');
-            component.update(params);
-          }
-          break;
         default:
           console.error('Unknown component type:', componentType);
       }
@@ -170,6 +94,49 @@
   }
 
   /* Exporting component */
-  win.HomePageView ||= HomePageView;
+  win.HistoricalDataView ||= HistoricalDataView;
 
 })(window);
+
+
+/*
+$(document).ready(function() {
+  const dataTable = $('#dataTable');
+  const pagination = $('#pagination');
+  const dateForm = $('#dateForm');
+
+  dateForm.submit(function(event) {
+    event.preventDefault();
+    const fromDate = $('#fromDate').val();
+    const toDate = $('#toDate').val();
+
+    // Make an AJAX request to your server API endpoint with fromDate and toDate
+    // Example using Axios
+    axios.get(`/your-api-endpoint?from=${fromDate}&to=${toDate}`)
+      .then(function(response) {
+        // Assuming the response is an array of objects with 'id' and 'date' fields
+        displayData(response.data);
+      })
+      .catch(function(error) {
+        console.error('Error fetching data:', error);
+      });
+  });
+
+  function displayData(data) {
+    // Clear previous table data
+    $('tbody', dataTable).empty();
+
+    // Display fetched data in the table
+    data.forEach(function(item) {
+      const row = `<tr>
+                    <td>${item.id}</td>
+                    <td>${item.date}</td>
+                    <!-- Add other table data here -->
+                  </tr>`;
+      $('tbody', dataTable).append(row);
+    });
+
+    // Add pagination logic here if needed
+    // Example: You might receive pagination information from the server and dynamically create pagination links.
+  }
+});*/

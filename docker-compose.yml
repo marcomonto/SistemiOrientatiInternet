@@ -55,7 +55,7 @@ services:
     ports:
       - 8005:8005
     environment:
-      - TTL=3600
+      - TTL=80
     networks:
       app-network:
         ipv4_address: 10.88.0.27
@@ -64,7 +64,7 @@ services:
     ports:
       - 8001:8001
     environment:
-      - TTL=3600
+      - TTL=120
     networks:
       app-network:
         ipv4_address: 10.88.0.28

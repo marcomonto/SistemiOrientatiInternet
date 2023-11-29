@@ -13,11 +13,27 @@
       subscription.unsubscribe();
     }
     subscription = null;
-    let comp = new HomePageComponent(client);
+    let comp = new HomePageView(client);
+    let elem = await comp.init();
+    components.forEach(c => c.destroy());
+    await root.appendChild(elem);
+    document.getElementById('historicalDataBtn').addEventListener('click',
+      () => loadHistoricalData()
+    );
+    components.push(comp);
+  }
+
+  async function loadHistoricalData() {
+    if (subscription) {
+      subscription.unsubscribe();
+    }
+    subscription = null;
+    let comp = new HistoricalDataView(client);
     let elem = await comp.init();
     components.forEach(c => c.destroy());
     await root.appendChild(elem);
     components.push(comp);
+
   }
 
   async function init() {

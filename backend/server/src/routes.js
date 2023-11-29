@@ -95,7 +95,7 @@ export function routes(app, wss, config) {
     }
   });
 
-  app.put('/api/sensors/tryToReconnect/:id', (req, res) => {
+  app.put('/api/sensors/tryToReconnect/:id', authenticated, (req, res) => {
     try {
       if (!validator.isAlphanumeric(req.params.id)
         || !memoryService.activeServices.find(el => el.id == req.params.id)
@@ -132,8 +132,8 @@ export function routes(app, wss, config) {
           success: false,
           message: 'invalid parameters'
         });
-      let responseFromService = await axios.post(
-        process.env.ACTUATOR_ADDRESS + '/api/sensor/' + req.params.id, {
+      let responseFromService = await axios.patch(
+        process.env.ACTUATOR_ADDRESS + '/api/sensor/' + req.params.id,{
           newStatus: payload.newStatus,
           workingTemperature: payload.workingTemperature
         });
@@ -141,7 +141,8 @@ export function routes(app, wss, config) {
         success: true,
         message: 'COMMAND_SENT'
       })
-    } catch (e) {
+    }
+    catch (e) {
       console.log(e.message)
       res.status(500).json({
         success: false
@@ -149,7 +150,7 @@ export function routes(app, wss, config) {
     }
   });
 
-  app.post('/api/sensor', async (req, res) => {
+  app.post('/api/sensor',authenticated, async (req, res) => {
     try {
       const payload = req.body;
       if (!payload.type || !payload.address || !['window', 'door'].includes(payload.type)) {
@@ -174,6 +175,7 @@ export function routes(app, wss, config) {
       })
     }
   });
+
   wss.on('connection', (ws, req) => {
     try {
       const handler = new WebsocketHandler(ws, config, 'client');

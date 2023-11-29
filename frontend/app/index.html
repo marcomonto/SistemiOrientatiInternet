@@ -125,10 +125,14 @@
                 Dashboard <span class="sr-only">(current)</span>
               </a>
             </li>
+            <li class="nav-item">
+              <a class="nav-link active" href="#" id="historicalDataBtn">
+                Historical Data
+              </a>
+            </li>
           </ul>
         </div>
       </nav>
-
       <main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
           <h1 class="h2">Dashboard</h1>
@@ -143,7 +147,36 @@
         </div>
       </main>
     </div>
-
+  </div>
+</script>
+<script type="text/html" id="historical-data-template">
+  <div class="container-fluid"  style="height: 70vh">
+    <h1>Paginated Table</h1>
+    <form id="dateForm">
+      <div class="form-row">
+        <div class="col">
+          <label for="fromDate">From Date:</label>
+          <input type="date" class="form-control" id="fromDate" name="fromDate">
+        </div>
+        <div class="col">
+          <label for="toDate">To Date:</label>
+          <input type="date" class="form-control" id="toDate" name="toDate">
+        </div>
+        <div class="col">
+          <button type="submit" class="btn btn-primary mt-4">Filter</button>
+        </div>
+      </div>
+    </form>
+    <table id="dataTable" class="table table-striped mt-4">
+      <thead>
+      <tr>
+        <th>ID</th>
+        <th>Date</th>
+      </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <nav id="pagination" aria-label="Table pagination"></nav>
   </div>
 </script>
 
@@ -187,6 +220,7 @@
 <script src="js/components/windowCard.js"></script>
 <script src="js/components/temperatureCard.js"></script>
 <script src="js/views/homePageView.js"></script>
+<script src="js/views/HistoricalDataView.js"></script>
 <script src="js/main.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"

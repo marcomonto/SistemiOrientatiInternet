@@ -76,12 +76,16 @@ export function routes(app, wss, config) {
     }
   });*/
 
-  app.post('/api/sensor/:id',async (req, res) => {
+  app.patch('/api/sensor/:id',async (req, res) => {
     try{
       let serviceToCall = memoryService.connections.find(el => el.id == req.params.id);
       const payload = req.body;
-      if(!serviceToCall)
-        return;
+      if(!serviceToCall){
+        return res.status(400).json({
+          success: false,
+          message: 'invalid parameters'
+        });
+      }
       const address = serviceToCall.address
       let responseFromService = await axios.put("http://" + address.replace("ws://", "") +'/api/status' ,{
         newStatus: payload.newStatus,
@@ -92,8 +96,7 @@ export function routes(app, wss, config) {
       })
     }
     catch (e) {
-      console.log(e.message)
-      res.json({
+      res.status(500).json({
         success: false
       })
     }
