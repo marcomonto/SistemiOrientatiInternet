@@ -152,6 +152,7 @@ export function routes(app, wss, config) {
 
   app.post('/api/sensor',authenticated, async (req, res) => {
     try {
+      // docker run -p 9001:9001 --network app-network --ip 10.88.0.11 window-service
       const payload = req.body;
       if (!payload.type || !payload.address || !['window', 'door'].includes(payload.type)) {
         return res.status(400).json({
@@ -160,14 +161,25 @@ export function routes(app, wss, config) {
         });
       }
       let databaseConnection = memoryService.getDatabaseConnection();
-      console.log(databaseConnection)
       let databaseResponse = await databaseConnection.store('availableServices',{
         address: payload.address,
         type: payload.type
       });
-      console.log(databaseResponse)
+      if(databaseResponse.success){
+        let serviceToAdd = {
+          id: databaseResponse.payload.id,
+          address: payload.address,
+          serviceType: payload.type
+        }
+        await axios.get(process.env.ACTUATOR_ADDRESS + '/api/refreshListServices');
+        memoryService.activeServices.push(serviceToAdd);
+        subscribeToServices([serviceToAdd]);
+      }
+      else throw new Error('CANT_CONNECT_TO_DATABASE');
 
-      return res.json(databaseResponse)
+      return res.json({
+        success: true
+      })
     } catch (e) {
       console.log(e.message)
       res.json({

@@ -4,6 +4,7 @@ import {WebSocketHandler} from './webSocketHandler.js';
 import {v4 as uuid} from 'uuid';
 import memoryService from "./memoryService.js";
 import axios from "axios";
+import PocketBase from "pocketbase";
 
 /**
  * Registers a new handler for the WS channel.
@@ -102,4 +103,17 @@ export function routes(app, wss, config) {
     }
   });
 
+  app.get('/api/refreshListServices', async (req,res) => {
+    try{
+      await memoryService.fetchConnections();
+      return res.status(200).json({
+        success: true
+      });
+    }
+    catch (e) {
+      return res.status(500).json({
+        success: false
+      })
+    }
+  })
 }
