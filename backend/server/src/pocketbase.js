@@ -26,10 +26,21 @@ export default class DatabaseHandler {
     }
   }
 
-  async get(collection, filters) {
+  async get(collection, params) {
     try {
-      if (!filters) {
+      if (!params) {
         let response = await this.#pb.collection(collection).getFullList();
+        return {
+          success: true,
+          payload: response
+        }
+      }
+      else {
+        let response = await this.#pb.collection(collection).getList(
+          params.page ?? 1, params.rowsPerPage ?? 10, {
+            filter: params.filters ?? null
+          }
+        );
         return {
           success: true,
           payload: response

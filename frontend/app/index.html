@@ -72,8 +72,8 @@
         <img src="img/binocolo.png"
              class="img-fluid" alt="Sample image">
       </div>
-        <div class="col-md-8 col-lg-6 col-xl-4 offset-xl-1">
-      <form>
+      <div class="col-md-8 col-lg-6 col-xl-4 offset-xl-1">
+        <form>
           <!-- Email input -->
           <div class="form-outline mb-4">
             <input type="email" id="userLogin" class="form-control form-control-lg"
@@ -108,19 +108,19 @@
             <!--<p class="small fw-bold mt-2 pt-1 mb-0">Don't have an account? <a href="#!"
                 class="link-danger">Register</a></p>-->
           </div>
-      </form>
-        </div>
+        </form>
+      </div>
     </div>
   </div>
 </script>
-<script type="text/html" id="homePage-template">
-  <div class="container-fluid"  style="height: 70vh">
+<script type="text/html" id="appSideBar">
+  <div class="container-fluid" style="height: 70vh" id="sidebarAppView">
     <div class="row" style="height: 100%">
       <nav class="col-md-2 d-none d-md-block bg-light sidebar">
         <div class="sidebar-sticky">
           <ul class="nav flex-column">
             <li class="nav-item">
-              <a class="nav-link active" href="#">
+              <a class="nav-link active" href="#" id="dashboardBtn">
                 <span data-feather="home"></span>
                 Dashboard <span class="sr-only">(current)</span>
               </a>
@@ -133,50 +133,59 @@
           </ul>
         </div>
       </nav>
-      <main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
-        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
-          <h1 class="h2">Dashboard</h1>
+      <main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4" id="mainAppView">
 
-          <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addSensorModal">
-            Add Sensor
-          </button>
-        </div>
-        <div class="container">
-          <div id="temperatureCards" class="row"></div>
-          <div id="sensorCards" class="row"></div>
-        </div>
       </main>
     </div>
   </div>
+
+</script>
+<script type="text/html" id="homePage-template">
+  <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
+    <h1 class="h2">Dashboard</h1>
+
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addSensorModal">
+      Add Sensor
+    </button>
+  </div>
+  <div class="container">
+    <div id="temperatureCards" class="row"></div>
+    <div id="sensorCards" class="row"></div>
+  </div>
 </script>
 <script type="text/html" id="historical-data-template">
-  <div class="container-fluid"  style="height: 70vh">
+  <div class="container-fluid" style="height: 70vh">
     <h1>Paginated Table</h1>
-    <form id="dateForm">
-      <div class="form-row">
-        <div class="col">
-          <label for="fromDate">From Date:</label>
-          <input type="date" class="form-control" id="fromDate" name="fromDate">
-        </div>
-        <div class="col">
-          <label for="toDate">To Date:</label>
-          <input type="date" class="form-control" id="toDate" name="toDate">
-        </div>
-        <div class="col">
-          <button type="submit" class="btn btn-primary mt-4">Filter</button>
-        </div>
+    <div class="form-row">
+      <div class="col">
+        <label for="fromDateFilter">From Date:</label>
+        <input type="date" class="form-control" id="fromDateFilter" name="fromDate">
       </div>
-    </form>
+      <div class="col">
+        <label for="toDateFilter">To Date:</label>
+        <input type="date" class="form-control" id="toDateFilter" name="toDate">
+      </div>
+      <div class="col">
+        <label for="typeFilter">Type:</label>
+        <select class="form-select form-select mb-3" aria-label=".form-select example" id="typeFilter">
+          <option value="weather">Weather Temperature</option>
+          <option value="home">Home Temperature</option>
+        </select>
+      </div>
+      <div class="col">
+        <button class="btn btn-primary mt-4" id="searchTableBtn">Search</button>
+      </div>
+    </div>
     <table id="dataTable" class="table table-striped mt-4">
       <thead>
       <tr>
-        <th>ID</th>
+        <th>Value</th>
         <th>Date</th>
       </tr>
       </thead>
       <tbody></tbody>
     </table>
-    <nav id="pagination" aria-label="Table pagination"></nav>
+    <!-- fare chart -->
   </div>
 </script>
 
@@ -192,7 +201,8 @@
           <div class="input-group-prepend">
             <span class="input-group-text" id="basic-addon1">Ip with port</span>
           </div>
-          <input type="text" class="form-control" placeholder="Username" aria-label="Username" aria-describedby="basic-addon1" id="sensorToAddAddress">
+          <input type="text" class="form-control" placeholder="Username" aria-label="Username"
+                 aria-describedby="basic-addon1" id="sensorToAddAddress">
         </div>
         <select class="form-select form-select mb-3" aria-label=".form-select example" id="sensorToAddType">
           <option value="door">Door</option>

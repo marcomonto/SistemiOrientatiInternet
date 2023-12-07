@@ -121,6 +121,37 @@ export function routes(app, wss, config) {
     }
   });
 
+  app.get('/api/healthCheck', authenticated, async (req,res) => {
+    //TODO call every active service to check if some children are lost
+    res.status(200).json({
+      success: true,
+      payload: memoryService.activeServices.filter(el => el.status == 'error')
+    })
+  });
+
+  app.get('/api/history', authenticated, async (req,res) => {
+    try {
+      let params = req.query;
+      let responseFromDB = memoryService.getDatabaseConnection()
+        .get(params.type === 'weather' ? 'weatherTemperatures' : 'homeTemperatures',
+          {
+            page: params.page,
+            rowsPerPage: params.rowsPerPage,
+            filters: params.filters
+          });
+      res.status(200).json(responseFromDB);
+    }
+    catch (e) {
+      res.status(500).json({
+        success: false
+      })
+    }
+    res.status(200).json({
+      success: true,
+      payload: memoryService.activeServices.filter(el => el.status == 'error')
+    })
+  });
+
   app.put('/api/sensor/:id', authenticated, async (req, res) => {
     try {
       const payload = req.body;

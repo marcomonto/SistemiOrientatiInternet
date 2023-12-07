@@ -33,64 +33,45 @@
     async init() {
       this.#element = document.createElement('div');
       this.#element.innerHTML = document.querySelector('script#historical-data-template').textContent;
+      let btn = document.querySelector('#searchTableBtn');
+      console.log(btn)
+      let hdlr = new Handler('click', btn, (e) => {
+        e.preventDefault();
+        this.populateTable();
+      });
+      this.#handlers.push(hdlr);
       return this.#element;
     }
 
-    async renderDynamicComponent(componentType, params) {
-      switch (componentType) {
-        case 'WindowCard':
-          const windowId = params.id
-          if(!this.#components.get('windowCard_' + windowId)){
-            const windowCard = new WindowCard(this.#client, params);
-            let element = await windowCard.init();
-            element.className = 'col-6';
-            element.style.height = '150px';
-            this.#element.querySelector('#sensorCards').appendChild(element);
-            windowCard.registerRenderComponents(); // init reactivity
-            this.#components.set('windowCard_' + windowId,windowCard);
-          }
-          else{
-            let component = this.#components.get('windowCard_' + windowId);
-            let divUpdated = component.update(params);
-            divUpdated.style.height = '150px';
-          }
-          break;
-        case 'DoorCard':
-          if(!this.#components.get('doorCard')){
-            const doorCard = new DoorCard(this.#client, params);
-            let element = await doorCard.init();
-            element.className = 'col-6';
-            element.style.height = '150px';
-            this.#element.querySelector('#sensorCards').appendChild(element);
-            doorCard.registerRenderComponents(); // init reactivity
-            this.#components.set('doorCard',doorCard);
-          }
-          else{
-            let component = this.#components.get('doorCard');
-            let divUpdated = component.update(params);
-            divUpdated.style.height = '150px';
-          }
-          break;
-        case 'HeatPumpCard':
-          if(!this.#components.get('heatPumpCard')){
-            const heatPumpCard = new HeatPumpCard(this.#client, params);
-            let element = await heatPumpCard.init()
-            element.className = 'col-6';
-            element.style.height = '150px';
-            this.#element.querySelector('#sensorCards').appendChild(element);
-            heatPumpCard.registerRenderComponents(); // init reactivity
-            this.#components.set('heatPumpCard',heatPumpCard);
-          }
-          else{
-            let component = this.#components.get('heatPumpCard');
-            let divUpdated = component.update(params);
-            divUpdated.style.height = '150px';
-          }
-          break;
-        default:
-          console.error('Unknown component type:', componentType);
-      }
+    async populateTable() {
+      let from = document.getElementById('fromDateFilter').value;
+      let to = document.getElementById('toDateFilter').value;
+      let type = document.getElementById('typeFilter').value;
+      console.log(from,to,type)
+      let response = await this.#client.get('history', {
+        page: 1,
+        rowsPerPage: 10,
+        filters: this.calcFiltersTable(from,to),
+        type: type
+      });
+      response?.data?.payload.forEach(item => {
+        const row = document.createElement('tr');
+          row.innerHTML = `
+        <td>${item.value}</td>
+        <td>${item.created}</td>
+      `;
+        document.getElementById('dataTable').appendChild(row);
+      });
     }
+
+    calcFiltersTable(from,to,type){
+      let filterString = '';
+      filterString += ('created >= ' + from +'&&');
+      filterString += ('created < ' + to );
+      return filterString;
+    }
+
+
   }
 
   /* Exporting component */
@@ -98,45 +79,3 @@
 
 })(window);
 
-
-/*
-$(document).ready(function() {
-  const dataTable = $('#dataTable');
-  const pagination = $('#pagination');
-  const dateForm = $('#dateForm');
-
-  dateForm.submit(function(event) {
-    event.preventDefault();
-    const fromDate = $('#fromDate').val();
-    const toDate = $('#toDate').val();
-
-    // Make an AJAX request to your server API endpoint with fromDate and toDate
-    // Example using Axios
-    axios.get(`/your-api-endpoint?from=${fromDate}&to=${toDate}`)
-      .then(function(response) {
-        // Assuming the response is an array of objects with 'id' and 'date' fields
-        displayData(response.data);
-      })
-      .catch(function(error) {
-        console.error('Error fetching data:', error);
-      });
-  });
-
-  function displayData(data) {
-    // Clear previous table data
-    $('tbody', dataTable).empty();
-
-    // Display fetched data in the table
-    data.forEach(function(item) {
-      const row = `<tr>
-                    <td>${item.id}</td>
-                    <td>${item.date}</td>
-                    <!-- Add other table data here -->
-                  </tr>`;
-      $('tbody', dataTable).append(row);
-    });
-
-    // Add pagination logic here if needed
-    // Example: You might receive pagination information from the server and dynamically create pagination links.
-  }
-});*/

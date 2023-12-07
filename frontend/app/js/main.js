@@ -4,36 +4,54 @@
   const client = new RestClient('/api');
   const root = document.querySelector('.content #root');
   /** @type {{init:()=>Promise<HTMLElement>,destroy:()=>void}[]} */
-  const components = [];
+  let components = [];
   /** @type {{unsubscribe:() => void}|null} */
   let subscription = null;
 
   async function loadHomePage() {
+    console.log(components, document.querySelector('#root #appSideBar'))
     if (subscription) {
       subscription.unsubscribe();
     }
     subscription = null;
+    let sidebar = document.createElement('div');
+    if(!document.querySelector('#root #sidebarAppView')){
+      sidebar.innerHTML = document.querySelector('script#appSideBar').textContent;
+      await root.appendChild(sidebar);
+    }
     let comp = new HomePageView(client);
     let elem = await comp.init();
+    const mainView = document.querySelector('#mainAppView');
     components.forEach(c => c.destroy());
-    await root.appendChild(elem);
+    components = [];
+    await mainView.appendChild(elem);
     document.getElementById('historicalDataBtn').addEventListener('click',
-      () => loadHistoricalData()
+      () => loadHistoricalData(), {once: true}
     );
     components.push(comp);
   }
 
   async function loadHistoricalData() {
+    console.log(components)
     if (subscription) {
       subscription.unsubscribe();
     }
     subscription = null;
+    let sidebar = document.createElement('div');
+    if(!document.querySelector('#root #sidebarAppView')){
+      sidebar.innerHTML = document.querySelector('script#appSideBar').textContent;
+      await root.appendChild(sidebar);
+    }
     let comp = new HistoricalDataView(client);
     let elem = await comp.init();
+    const mainView = document.querySelector('#mainAppView');
     components.forEach(c => c.destroy());
-    await root.appendChild(elem);
+    components = [];
+    await mainView.appendChild(elem);
+    document.getElementById('dashboardBtn').addEventListener('click',
+      () => loadHomePage(), {once: true}
+    );
     components.push(comp);
-
   }
 
   async function init() {

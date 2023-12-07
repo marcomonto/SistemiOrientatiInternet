@@ -7,6 +7,8 @@
     #client;
     /** @type {Handler[]} */
     #handlers = [];
+    #socket = null;
+    #intervalLostSensors = null;
     #components = new Map();
 
     /**
@@ -27,6 +29,8 @@
     destroy() {
       this.#handlers.forEach(h => h.unregister());
       this.#element.remove();
+      this.#socket.close();
+      clearInterval(this.#intervalLostSensors);
     }
 
     /**
@@ -37,6 +41,10 @@
       this.#element = document.createElement('div');
       this.#element.innerHTML = document.querySelector('script#homePage-template').textContent;
       this.connectWebSocket();
+      this.#intervalLostSensors = setInterval(async () => {
+        let response = await this.#client.get('healthCheck')
+        console.log(response)
+      }, 15000)
       return this.#element;
     }
 
@@ -54,15 +62,15 @@
     }
 
     connectWebSocket() {
-      const socket = new WebSocket('ws://'+ window.location.hostname +':8000'); // Replace with your WebSocket server URL
+      this.#socket = new WebSocket('ws://'+ window.location.hostname +':8000'); // Replace with your WebSocket server URL
       // WebSocket event handlers
-      socket.onopen = () => {
+      this.#socket.onopen = () => {
         // Send a message to the WebSocket server
-        socket.send(JSON.stringify({
+        this.#socket.send(JSON.stringify({
           type: 'subscribe'
         }));
       };
-      socket.onmessage =  (event) => {
+      this.#socket.onmessage =  (event) => {
         try {
           let message = JSON.parse(event.data);
           let serviceType = message.payload.serviceType;
@@ -91,7 +99,7 @@
         }
 
       };
-      socket.onclose = function () {
+      this.#socket.onclose = function () {
         console.log('WebSocket connection closed.');
       };
 
