@@ -132,7 +132,8 @@ export function routes(app, wss, config) {
   app.get('/api/history', authenticated, async (req,res) => {
     try {
       let params = req.query;
-      let responseFromDB = memoryService.getDatabaseConnection()
+      console.log(params.filters)
+      let responseFromDB = await memoryService.getDatabaseConnection()
         .get(params.type === 'weather' ? 'weatherTemperatures' : 'homeTemperatures',
           {
             page: params.page,
@@ -142,14 +143,11 @@ export function routes(app, wss, config) {
       res.status(200).json(responseFromDB);
     }
     catch (e) {
+      console.log(e.message)
       res.status(500).json({
         success: false
       })
     }
-    res.status(200).json({
-      success: true,
-      payload: memoryService.activeServices.filter(el => el.status == 'error')
-    })
   });
 
   app.put('/api/sensor/:id', authenticated, async (req, res) => {
