@@ -3,12 +3,21 @@ import memoryService from "./memoryService.js";
 
 export function subscribeToServices(services) {
   for (const service of services) {
+    let serviceAdded = memoryService.activeServices.find(el => el.id === service.id)
+    // handle useless try to reconnect in concurrent requests case
+    if(!!serviceAdded && serviceAdded.status !== 'error')
+      return;
     const ws = new WebSocket(service.address);
     // Event: WebSocket connection opened
     ws.on('open', () => {
       console.log('Connected to the websocket server with address ' + service.serviceType);
-      if (!memoryService.activeServices.find(el => el.id === service.id)) {
+      // first create
+      if (!serviceAdded) {
         memoryService.activeServices.push(service);
+      }
+      //service present and reactivated after status error
+      else{
+        serviceAdded.status = 'on';
       }
       if (service.serviceType === memoryService.serviceTypes.WEATHER) {
         ws.send(JSON.stringify({type: 'subscribe', target: 'temperature'}));

@@ -64,7 +64,7 @@ services:
     ports:
       - 8001:8001
     environment:
-      - TTL=3600
+      - TTL=30
       - ERROR_PROB = 0
     networks:
       app-network:
@@ -79,7 +79,7 @@ services:
       - ERROR_PROB = 0
       - DELAY_PROB = 0.2
       - FREQ_MS = 2000
-      - TTL=3600
+      - TTL=40
     networks:
       app-network:
         ipv4_address: 10.88.0.29

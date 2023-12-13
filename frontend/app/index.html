@@ -30,11 +30,8 @@
 </head>
 
 <body>
-<div style="height: 100vh;">
-
-  <div class="content" style="min-height: calc(100% - 100px);">
-
-    <!-- Header -->
+<div id="container" style="min-height: 150vh; height: auto">
+  <div class="content" style=" height: auto;min-height: 100%;">
     <div class="header">
       <h1 class="text-center d-flex align-items-center">
         <div style="
@@ -55,11 +52,15 @@
     <div id="root"></div>
   </div>
   <footer style="
-      position: sticky;
-      bottom: 0;
-      width: 100%;"
+    clear: both;
+    position: relative;
+    z-index: 10;
+    height: 3em;
+    margin-top: -3em;
+    background-color:grey;
+    "
   >
-    <ul class="nav justify-content-center border-bottom  mb-1">
+    <ul class="nav justify-content-center">
       <li class="nav-item"><a href="https://marcomontorsi.it" class="nav-link px-2 text-muted">About</a></li>
     </ul>
     <p class="text-center text-muted">&copy; Developed with 😢 by Marco Montorsi</p>
@@ -155,7 +156,7 @@
 </script>
 <script type="text/html" id="historical-data-template">
   <div class="container-fluid" style="height: 70vh">
-    <h1>Paginated Table</h1>
+    <h1>Historical Data</h1>
     <div class="form-row">
       <div class="col">
         <label for="fromDateFilter">From Date:</label>
@@ -187,7 +188,7 @@
     </table>
     <div class="d-flex justify-content-between align-items-center">
       <label for="perPageSelect">Rows per page</label>
-      <select id="perPageSelect" class="form-select form-select-sm">
+      <select id="perPageSelect" class="form-select form-select-sm mx-5" style="max-width: 100px">
         <option value="5">5</option>
         <option value="10">10</option>
         <option value="15">15</option>

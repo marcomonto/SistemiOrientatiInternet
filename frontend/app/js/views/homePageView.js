@@ -40,10 +40,15 @@
     async init() {
       this.#element = document.createElement('div');
       this.#element.innerHTML = document.querySelector('script#homePage-template').textContent;
+
       this.connectWebSocket();
       this.#intervalLostSensors = setInterval(async () => {
         let response = await this.#client.get('healthCheck')
-        console.log(response)
+        if(response.success){
+          response.payload.forEach(serviceToWakeUp => {
+            this.#client.put('sensors/tryToReconnect/' + serviceToWakeUp.id);
+          });
+        }
       }, 15000)
       return this.#element;
     }
@@ -125,17 +130,18 @@
           }
           break;
         case 'DoorCard':
-          if(!this.#components.get('doorCard')){
+          const doorId = params.id
+          if(!this.#components.get('doorCard_' + doorId)){
             const doorCard = new DoorCard(this.#client, params);
             let element = await doorCard.init();
             element.className = 'col-6';
             element.style.height = '150px';
             this.#element.querySelector('#sensorCards').appendChild(element);
             doorCard.registerRenderComponents(); // init reactivity
-            this.#components.set('doorCard',doorCard);
+            this.#components.set('doorCard_' + doorId,doorCard);
           }
           else{
-            let component = this.#components.get('doorCard');
+            let component = this.#components.get('doorCard_' + doorId);
             let divUpdated = component.update(params);
             divUpdated.style.height = '150px';
           }

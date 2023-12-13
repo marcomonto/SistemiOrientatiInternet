@@ -14,8 +14,14 @@ import {subscribeToServices} from "./websocketSubscriberToServices.js";
  */
 export function routes(app, wss, config) {
   const authenticated = (req, res, next) => req.cookies?.tokenLookout ?
-    (jwt.verify(req.cookies.tokenLookout, config.jwtSecretKey) ? next() : res.sendStatus(401)) :
-    res.sendStatus(401);
+    (jwt.verify(req.cookies.tokenLookout, config.jwtSecretKey,(err, decoded) =>{
+      if (err) {
+        return res.status(403).json({ message: 'Failed to authenticate token' });
+      }
+      // Token is valid, decoded contains the user information
+      req.user = decoded;
+      next();
+    })) : res.sendStatus(401);
 
   app.post('/api/login', (req, res) => {
     try {
@@ -95,7 +101,7 @@ export function routes(app, wss, config) {
     }
   });
 
-  app.put('/api/sensors/tryToReconnect/:id', authenticated, (req, res) => {
+  app.put('/api/sensors/tryToReconnect/:id', authenticated, (req, res) =>  {
     try {
       if (!validator.isAlphanumeric(req.params.id)
         || !memoryService.activeServices.find(el => el.id == req.params.id)
@@ -105,14 +111,12 @@ export function routes(app, wss, config) {
           message: 'invalid parameters'
         });
       let serviceToRestore = memoryService.activeServices.find(el => el.id === req.params.id);
-      setTimeout(() => {
-        subscribeToServices([{
-          ...serviceToRestore
-        }]);
-        return res.json({
-          success: true,
-        })
-      }, 2000);
+      subscribeToServices([{
+        ...serviceToRestore
+      }]);
+      return res.json({
+        success: true,
+      });
     } catch (e) {
       console.log(e)
       return res.status(500).json({
@@ -121,15 +125,15 @@ export function routes(app, wss, config) {
     }
   });
 
-  app.get('/api/healthCheck', authenticated, async (req,res) => {
+  app.get('/api/healthCheck', authenticated, async (req, res) => {
     //TODO call every active service to check if some children are lost
     res.status(200).json({
       success: true,
-      payload: memoryService.activeServices.filter(el => el.status == 'error')
+      payload: memoryService.activeServices.filter(el => el.status === 'error')
     })
   });
 
-  app.get('/api/history', authenticated, async (req,res) => {
+  app.get('/api/history', authenticated, async (req, res) => {
     try {
       let params = req.query;
       console.log(params.filters)
@@ -141,8 +145,7 @@ export function routes(app, wss, config) {
             filters: params.filters
           });
       res.status(200).json(responseFromDB);
-    }
-    catch (e) {
+    } catch (e) {
       console.log(e.message)
       res.status(500).json({
         success: false
@@ -162,7 +165,7 @@ export function routes(app, wss, config) {
           message: 'invalid parameters'
         });
       let responseFromService = await axios.patch(
-        process.env.ACTUATOR_ADDRESS + '/api/sensor/' + req.params.id,{
+        process.env.ACTUATOR_ADDRESS + '/api/sensor/' + req.params.id, {
           newStatus: payload.newStatus,
           workingTemperature: payload.workingTemperature
         });
@@ -170,8 +173,7 @@ export function routes(app, wss, config) {
         success: true,
         message: 'COMMAND_SENT'
       })
-    }
-    catch (e) {
+    } catch (e) {
       console.log(e.message)
       res.status(500).json({
         success: false
@@ -179,7 +181,7 @@ export function routes(app, wss, config) {
     }
   });
 
-  app.post('/api/sensor',authenticated, async (req, res) => {
+  app.post('/api/sensor', authenticated, async (req, res) => {
     try {
       // docker run -p 9001:9001 --network app-network --ip 10.88.0.11 window-service
       const payload = req.body;
@@ -190,11 +192,11 @@ export function routes(app, wss, config) {
         });
       }
       let databaseConnection = memoryService.getDatabaseConnection();
-      let databaseResponse = await databaseConnection.store('availableServices',{
+      let databaseResponse = await databaseConnection.store('availableServices', {
         address: payload.address,
         type: payload.type
       });
-      if(databaseResponse.success){
+      if (databaseResponse.success) {
         let serviceToAdd = {
           id: databaseResponse.payload.id,
           address: payload.address,
@@ -203,8 +205,7 @@ export function routes(app, wss, config) {
         await axios.get(process.env.ACTUATOR_ADDRESS + '/api/refreshListServices');
         memoryService.activeServices.push(serviceToAdd);
         subscribeToServices([serviceToAdd]);
-      }
-      else throw new Error('CANT_CONNECT_TO_DATABASE');
+      } else throw new Error('CANT_CONNECT_TO_DATABASE');
 
       return res.json({
         success: true

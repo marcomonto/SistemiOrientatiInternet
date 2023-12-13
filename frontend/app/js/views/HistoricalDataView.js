@@ -37,6 +37,7 @@
       let searchBtn = this.#element.querySelector('#searchTableBtn');
       let prevBtn = this.#element.querySelector('#prevBtn');
       let nextBtn = this.#element.querySelector('#nextBtn');
+      let selectRowsPerPage = this.#element.querySelector('#perPageSelect');
       let hdlr = new Handler('click', searchBtn, (e) => {
         this.populateTable();
       });
@@ -50,9 +51,14 @@
           this.#currentPage = 1;
         this.populateTable();
       });
+      let hdlr4 = new Handler('change', selectRowsPerPage, (e) => {
+        this.#currentPage = 1;
+        this.populateTable();
+      });
       this.#handlers.push(hdlr);
       this.#handlers.push(hdlr2);
       this.#handlers.push(hdlr3);
+      this.#handlers.push(hdlr4);
       return this.#element;
     }
 
@@ -80,7 +86,7 @@
           document.getElementById('dataTableBody').appendChild(row);
         });
         document.getElementById('pageAndTotalItems').innerHTML =
-          "Page " + response.payload.page + 'of ' + response.payload.totalPages
+          "Page " + response.payload.page + ' of ' + response.payload.totalPages
       } catch (e) {
         console.log(e.message)
       }
