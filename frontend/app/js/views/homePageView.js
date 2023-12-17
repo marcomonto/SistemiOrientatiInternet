@@ -10,14 +10,16 @@
     #socket = null;
     #intervalLostSensors = null;
     #components = new Map();
+    #tokenWs = null;
 
     /**
      * Instances a new `LoginComponent`.
      * @param client {RestClient} The REST client
      */
-    constructor(client) {
+    constructor(client, tokenWs) {
       super();
       this.#client = client;
+      this.#tokenWs = tokenWs;
       document.getElementById('confirmAddSensorButton').addEventListener('click',
         () => this.addSensor(document.getElementById('sensorToAddAddress').value,document.getElementById('sensorToAddType').value)
       );
@@ -67,7 +69,11 @@
     }
 
     connectWebSocket() {
-      this.#socket = new WebSocket('ws://'+ window.location.hostname +':8000'); // Replace with your WebSocket server URL
+      this.#socket = new WebSocket('ws://'+ window.location.hostname +':8000',null,{
+        headers: {
+          Authorization: this.#tokenWs,
+        },
+      }); // Replace with your WebSocket server URL
       // WebSocket event handlers
       this.#socket.onopen = () => {
         // Send a message to the WebSocket server

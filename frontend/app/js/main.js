@@ -8,8 +8,8 @@
   /** @type {{unsubscribe:() => void}|null} */
   let subscription = null;
 
-  async function loadHomePage() {
-    console.log(components, document.querySelector('#root #appSideBar'))
+  async function loadHomePage(tokenWs) {
+    console.log(tokenWs)
     if (subscription) {
       subscription.unsubscribe();
     }
@@ -19,7 +19,7 @@
       sidebar.innerHTML = document.querySelector('script#appSideBar').textContent;
       await root.appendChild(sidebar);
     }
-    let comp = new HomePageView(client);
+    let comp = new HomePageView(client,tokenWs);
     let elem = await comp.init();
     const mainView = document.querySelector('#mainAppView');
     components.forEach(c => c.destroy());
@@ -57,10 +57,11 @@
   async function init() {
     let elem, /** @type {{init:()=>Promise<HTMLElement>,destroy:()=>void}} */ comp;
     try {
-      let response = await client.get('user/details', {})
+      let response = await client.get('wsAuthToken', {})
       if (!!response)
-        await loadHomePage();
+        await loadHomePage(response.payload);
     } catch (e) {
+      console.log(e.message)
       if (e.status === 401) {
         comp = new LoginComponent(client);
         subscription = comp.on('logged', () => loadHomePage());

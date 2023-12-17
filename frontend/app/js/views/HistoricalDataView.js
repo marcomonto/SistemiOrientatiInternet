@@ -93,7 +93,7 @@
     }
 
     calcFiltersTable(from, to) {
-      return 'created >= "' + from + '" ' + '&&' + ' ' + 'created < "' + to + '"';
+      return 'created >= "' + from + '" ' + '&&' + ' ' + 'created < "' + to + ' 23:59:59"';
     }
 
 

@@ -14,9 +14,9 @@ import {subscribeToServices} from "./websocketSubscriberToServices.js";
  */
 export function routes(app, wss, config) {
   const authenticated = (req, res, next) => req.cookies?.tokenLookout ?
-    (jwt.verify(req.cookies.tokenLookout, config.jwtSecretKey,(err, decoded) =>{
+    (jwt.verify(req.cookies.tokenLookout, config.jwtSecretKey, (err, decoded) => {
       if (err) {
-        return res.status(403).json({ message: 'Failed to authenticate token' });
+        return res.status(403).json({message: 'Failed to authenticate token'});
       }
       // Token is valid, decoded contains the user information
       req.user = decoded;
@@ -101,7 +101,7 @@ export function routes(app, wss, config) {
     }
   });
 
-  app.put('/api/sensors/tryToReconnect/:id', authenticated, (req, res) =>  {
+  app.put('/api/sensors/tryToReconnect/:id', authenticated, (req, res) => {
     try {
       if (!validator.isAlphanumeric(req.params.id)
         || !memoryService.activeServices.find(el => el.id == req.params.id)
@@ -131,6 +131,25 @@ export function routes(app, wss, config) {
       success: true,
       payload: memoryService.activeServices.filter(el => el.status === 'error')
     })
+  });
+
+  app.get('/api/wsAuthToken', authenticated, (req, res) => {
+    try {
+      const token = jwt.sign({
+        tokenForAuth: true,
+        createdAt: new Date().toISOString(),
+        user: req.user
+      }, config.jwtSecretKey);
+      res.status(200).json({
+        success: true,
+        payload: token
+      })
+    } catch (e) {
+      console.log(e.message)
+      res.status(500).json({
+        success: false
+      })
+    }
   });
 
   app.get('/api/history', authenticated, async (req, res) => {
@@ -220,6 +239,7 @@ export function routes(app, wss, config) {
 
   wss.on('connection', (ws, req) => {
     try {
+      jwt.verify(req.headers.cookie.tokenLookout, config.jwtSecretKey);
       const handler = new WebsocketHandler(ws, config, 'client');
       memoryService.addWebsocketHandler(handler);
       registerHandler(ws, handler);
