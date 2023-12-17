@@ -9,7 +9,6 @@
   let subscription = null;
 
   async function loadHomePage(tokenWs) {
-    console.log(tokenWs)
     if (subscription) {
       subscription.unsubscribe();
     }
@@ -32,7 +31,6 @@
   }
 
   async function loadHistoricalData() {
-    console.log(components)
     if (subscription) {
       subscription.unsubscribe();
     }
@@ -49,7 +47,10 @@
     components = [];
     await mainView.appendChild(elem);
     document.getElementById('dashboardBtn').addEventListener('click',
-      () => loadHomePage(), {once: true}
+      async () => {
+        const response = await client.get('wsAuthToken', {})
+        await loadHomePage(response.payload);
+      }, {once: true}
     );
     components.push(comp);
   }
@@ -64,7 +65,10 @@
       console.log(e.message)
       if (e.status === 401) {
         comp = new LoginComponent(client);
-        subscription = comp.on('logged', () => loadHomePage());
+        subscription = comp.on('logged', async () => {
+          const response = await client.get('wsAuthToken', {})
+          await loadHomePage(response.payload);
+        });
         elem = await comp.init();
         components.forEach(c => c.destroy());
         await root.appendChild(elem);
@@ -75,6 +79,4 @@
 
   await init();
   console.info('🏁 Application initialized');
-
-
 })();

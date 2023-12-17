@@ -21,7 +21,9 @@
       this.#client = client;
       this.#tokenWs = tokenWs;
       document.getElementById('confirmAddSensorButton').addEventListener('click',
-        () => this.addSensor(document.getElementById('sensorToAddAddress').value,document.getElementById('sensorToAddType').value)
+        () => {
+          this.addSensor(document.getElementById('sensorToAddAddress').value,document.getElementById('sensorToAddType').value)
+        }
       );
     }
 

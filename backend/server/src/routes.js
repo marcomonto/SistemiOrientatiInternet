@@ -5,6 +5,7 @@ import memoryService from "./memoryService.js";
 import validator from "validator";
 import axios from "axios";
 import {subscribeToServices} from "./websocketSubscriberToServices.js";
+import {token} from "morgan";
 
 /**
  * Initializes routes.
@@ -219,7 +220,8 @@ export function routes(app, wss, config) {
         let serviceToAdd = {
           id: databaseResponse.payload.id,
           address: payload.address,
-          serviceType: payload.type
+          serviceType: payload.type,
+          status: 'error'
         }
         await axios.get(process.env.ACTUATOR_ADDRESS + '/api/refreshListServices');
         memoryService.activeServices.push(serviceToAdd);
@@ -239,7 +241,12 @@ export function routes(app, wss, config) {
 
   wss.on('connection', (ws, req) => {
     try {
-      jwt.verify(req.headers.cookie.tokenLookout, config.jwtSecretKey);
+      const cookiesToParse = req.headers.cookie
+      const startIndex = cookiesToParse.indexOf('tokenLookout=') + 'tokenLookout='.length;
+      const endIndex = cookiesToParse.indexOf(';', startIndex);
+      const tokenLookout = cookiesToParse.substring(startIndex, endIndex);
+      console.log(tokenLookout)
+      jwt.verify(tokenLookout, config.jwtSecretKey);
       const handler = new WebsocketHandler(ws, config, 'client');
       memoryService.addWebsocketHandler(handler);
       registerHandler(ws, handler);
