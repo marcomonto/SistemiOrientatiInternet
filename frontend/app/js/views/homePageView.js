@@ -21,8 +21,9 @@
       this.#client = client;
       this.#tokenWs = tokenWs;
       document.getElementById('confirmAddSensorButton').addEventListener('click',
-        () => {
-          this.addSensor(document.getElementById('sensorToAddAddress').value,document.getElementById('sensorToAddType').value)
+        async () => {
+          await this.addSensor(document.getElementById('sensorToAddAddress').value,document.getElementById('sensorToAddType').value)
+          bootstrap.Modal.getOrCreateInstance(document.getElementById('addSensorModal')).hide();
         }
       );
     }

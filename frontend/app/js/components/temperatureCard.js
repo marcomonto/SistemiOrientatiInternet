@@ -109,8 +109,8 @@
           {
             id: 'WEATHER',
             label: type === 'WEATHER' ? 'Weather Temperature' : 'Home Temperature',
-            backgroundColor: 'rgb(255, 99, 132)',
-            borderColor: 'rgb(255, 99, 132)',
+            backgroundColor: type === 'WEATHER' ? 'rgb(23, 99, 132)' : 'rgb(87, 3, 67)',
+            borderColor: type === 'WEATHER' ? 'rgb(23, 99, 132)' : 'rgb(87, 3, 67)',
             data: [],
           },
         ]

@@ -243,7 +243,7 @@ export function routes(app, wss, config) {
     try {
       const cookiesToParse = req.headers.cookie
       const startIndex = cookiesToParse.indexOf('tokenLookout=') + 'tokenLookout='.length;
-      const endIndex = cookiesToParse.indexOf(';', startIndex);
+      const endIndex = cookiesToParse.includes(';') ? cookiesToParse.indexOf(';', startIndex) : undefined;
       const tokenLookout = cookiesToParse.substring(startIndex, endIndex);
       console.log(tokenLookout)
       jwt.verify(tokenLookout, config.jwtSecretKey);

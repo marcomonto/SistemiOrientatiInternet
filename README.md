@@ -10,6 +10,8 @@ Accedi all'applicazione tramite:
 Indirizzo: http://montorsi.soi2223.unipr.it:8080/
 **Username**: marcomonto
 **Password**: password
+
+
 Indirizzo del Database:
 
 Indirizzo: http://localhost:8085/_/
@@ -22,8 +24,7 @@ Dopo aver effettuato l'accesso con un token JWT, gli utenti possono accedere all
 In caso di errori del servizio, c'è la possibilità di riconnessione manuale, anche se avviene automaticamente ogni 30 secondi.
 
 //TODO
-Spiegazioni sulle Funzionalità
-Calcolo della Temperatura
+Calcolo della temperatura
 Spiega il processo o i dettagli del calcolo della temperatura.
 
 //TODO
