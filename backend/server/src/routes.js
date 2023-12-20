@@ -91,6 +91,7 @@ export function routes(app, wss, config) {
     }
   });
 
+  // CALLED BY DOCKER MICROSERVICE
   app.get('/api/sensors', (req, res) => {
     try {
       return res.json({
@@ -205,7 +206,8 @@ export function routes(app, wss, config) {
     try {
       // docker run -p 9001:9001 --network app-network --ip 10.88.0.11 window-service
       const payload = req.body;
-      if (!payload.type || !payload.address || !['window', 'door'].includes(payload.type)) {
+      const regex = /^ws:\/\/\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}:\d{1,5}$/;
+      if (!payload.type || !payload.address || !['window', 'door'].includes(payload.type) || !regex.test(payload.address)) {
         return res.status(400).json({
           success: false,
           message: 'invalid parameters'
