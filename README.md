@@ -1,85 +1,90 @@
-//TODO TO FINISH
+Project SOI Montorsi
 
-Progetto SOI Montorsi
-Per avviare il progetto, esegui il seguente comando nel terminale:
-
+To start the project, execute the following command in the terminal:
+``` 
 docker-compose up --build
+``` 
+Access the application via:
 
-Accedi all'applicazione tramite:
+**Address**: http://montorsi.soi2223.unipr.it:8080/
 
-Indirizzo: http://montorsi.soi2223.unipr.it:8080/
 **Username**: marcomonto
+
 **Password**: password
 
+Make sure to add the following address to the /etc/hosts file:
+``` 
+127.0.0.1       localhost montorsi.soi2223.unipr.it
+``` 
+Database Address:
 
-Indirizzo del Database:
+**Address**: http://localhost:8085/_/
 
-Indirizzo: http://localhost:8085/_/
 **Username**: prova@mail.com
+
 **Password**: provaprova
-## Architettura
+
+
+## Architecture
 
 ![Architettura](docs/architettura.png)
 
 
 ## Autenticazione
-L'autenticazione avviene tramite delle semplici credenziali, user e password,
-in caso di credenziali corrette, si viene loggati, l'autenticazione è basata su un JWT token
-salvato come cookie in http only, per evitare una possibile code manipulation da javascript.
+Authentication occurs through simple credentials, username,
+and password. Upon correct credentials, one gets logged in.
+The authentication relies on a JWT token saved as an HTTP-only cookie
+to prevent possible code manipulation from JavaScript.
 
 ![Login](docs/login.png)
 
-Ovviamente se si accede alla web app con una sessione già attiva si verrà reindirizzati alla home
+Upon accessing the web app with an active session, the user will be redirected to the home.
 
 ## Dashboard
-L'utente vedrà in tempo reale, grazie a una connessione webSocket protetta, i dati dei vari sensori.
+The user will see real-time data from various sensors through a secure WebSocket connection.
 
 ![dashboard](docs/dashboard.png)
 
-Il render dei componenti avviene tramite l'utilizzo della libreria **rxjs** che si occupa di renderizzare correttamente
-i vari elementi grafici in base agli input dal server, inoltre per facilitare lo sviluppo si è utilizzato Boostrap 5 per diversi
-componenti grafici.
+The component rendering occurs using the rxjs library, responsible for rendering the graphical elements based on inputs from the server.
+Additionally, Bootstrap 5 is used to ease the development of various graphical components.
 
-Il pannello offre la possibilità di aprire e chiudere i vari sensori, cosi da influenzare la temperatura interna.
+The panel offers the possibility to open and close various sensors to influence the internal temperature.
 
-In caso di sensore aperto il bordo sarà di colore verde con attivo il bottone di chiusura.
+When a sensor is open, the border will be green with the close button active.
 
 ![open](docs/serviceOpened.png)
 
-In caso di sensore chiuso il bordo sarà di colore grigio con attivo il bottone di apertura.
+When a sensor is closed, the border will be grey with the open button active.
 
 ![closed](docs/serviceClosed.png)
 
-In caso di sensore in errore il bordo sarà di colore rosso con attivo il bottone di prova di riconessione.
+In the case of a sensor error, the border will be red with the reconnect test button active.
 
 ![error](docs/serviceError.png)
 
-Il calcolo della temperatura viene, per ovvi motivi, simulato;
-Per vedere come funziona l'algoritmo si può visionare il file in **thermometer-service/src/temperature.js**.
-In maniera concisa, varia in base al delta tra temperatura esterna e interna. 
-Con dipendenze lineari da finestre e porte dove semplicemente la porta avrà il doppio del peso della finestra.
-La pompa di calore influenzerà la temperatura interna in base ovviamente alla temperatura di operazione.
-In caso di sensore in errore l'algoritmo lo ritiene come se fosse chiuso.
+Temperature calculation is simulated for obvious reasons; the algorithm can be reviewed in the thermometer-service/src/temperature.js file.
+In short, it varies based on the delta between external and internal temperatures, with linear dependencies on windows and doors,
+where the door's weight is simply double that of the window. The heat pump will influence the internal temperature based on its operating temperature.
+In the case of a sensor error, the algorithm treats it as closed.
 
-### Aggiunta dinamica sensori
+### Dynamic Sensor Addition
 
-E' presente anche la possibilità di aggiungere dinamicamente servizi di tipo **porta** e/o **finestra**.
-Prima di inserirli nel dialogo, bisogna lanciare i container docker dei servizi che si vogliono aggiungere, come da esempio
+There's also the possibility to dynamically add door and/or window services. Before adding them to the dialogue, 
+you need to launch the docker containers of the services you want to add, as shown in the example:
 ``` 
 docker run -p 8101:8101 --name new-window --network app-network --ip 10.88.0.200 -e IFACE=10.88.0.200 -e PORT=8101 -e=ERROR_PROB=0 window
 ``` 
-Una volta lanciato il container si dovrà aggiungere il sensore con la sintassi
-**ws://[ipAddress]:[port]**
+Once the container is launched, you'll have to add the sensor using the syntax ws://[ipAddress]:[port]
 
 ![addSensor](docs/addSensor.png)
 
-### Gestione caduta sensori
-In caso di errore dei sensori, si può cercare di riattivare nuovamente la connessione tramite webSocket, oppure ciclicamente lato 
-frontend viene richiamata una api che ha il compito di andare a cercare di riattivare i sensori in errore.
+### Handling Sensor Failures
+In case of sensor errors, you can attempt to reactivate the connection via WebSocket, or cyclically,
+the frontend calls an API responsible for attempting to reactivate the sensors in error.
 
-## Visione storico 
+## Historical View
 
-Esiste la possibilità di visionare in forma tabellare i vari dati salvati a database.
+There's the possibility to view saved data from the database in a tabular form.
 
 
 ![addSensor](docs/history.png)
@@ -87,8 +92,8 @@ Esiste la possibilità di visionare in forma tabellare i vari dati salvati a dat
 
 
 ## Database con Pocketbase
-Per salvare dati in database si usa il BAAS (Backend as a service) **Pocketbase**, un ottima soluzione basata su Go e sqlite,
-la quale permette una immediata implementazione di api crud in maniera automatica, ed altre interessanti possibili implementazioni.
+To save data in the database, Pocketbase, a Backend as a Service (BAAS) based on Go and sqlite, is used.
+It allows immediate implementation of CRUD APIs automatically and offers other interesting possible implementations.
 
 ![addSensor](docs/pocketbase.png)
 
